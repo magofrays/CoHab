@@ -1,0 +1,25 @@
+
+spring:
+
+  thymeleaf:
+    prefix: classpath:/templates/
+    check-template-location: true
+  application:
+    name: CoHab
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/cohab
+    username: magofrays
+    password: labubu
+  jpa:
+    properties.hibernate:
+      show_sql: true
+      format_sql: true
+      hbm2ddl.auto: create
+logging:
+  level:
+    root: INFO
+server:
+  port: 8081
+  address: 0.0.0.0
+
