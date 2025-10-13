@@ -1,7 +1,8 @@
 package by.magofrays.dto;
-
 import lombok.Builder;
 import lombok.Value;
+
+import java.util.List;
 import java.util.UUID;
 
 @Value
@@ -11,4 +12,5 @@ public class ReadMemberDto {
     String username;
     PersonalInfoDto personalInfoDto;
     FamilyDto familyDto;
+    List<AccessDto> accesses;
 }

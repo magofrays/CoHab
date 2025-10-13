@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 public class RegistrationController {
-    @GetMapping("/registration")
+    @GetMapping("/register")
     public String registration(Model model, @ModelAttribute("member") SmallMemberDto createMemberDto,
                                @ModelAttribute("personalInfo") PersonalInfoDto personalInfoDto){
         model.addAttribute("member", createMemberDto);

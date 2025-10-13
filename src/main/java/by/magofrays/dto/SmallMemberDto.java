@@ -8,10 +8,8 @@ import by.magofrays.validation.Unique;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Value;
-import by.magofrays.validation.BadLogin;
 
 @Value
-@BadLogin(message = "Никнейм или пароль не верны!", groups = {LoginGroup.class})
 @Builder
 public class SmallMemberDto {
     @Unique(message = "Пользователь с таким никнеймом уже существует!",

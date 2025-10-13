@@ -51,26 +51,11 @@ public class MemberController {
 
     @GetMapping("/{username}")
     public String findByUsername(@PathVariable("username") String username, Model model){
-        var member = memberService.findByUsername(username).get();
+        var member = memberService.findByUsername(username).get(); // fix
         model.addAttribute("member", member);
 
         return "member/member";
     }
 
-    @PostMapping("/login")
-    public String login(
-            @ModelAttribute @Validated({LoginGroup.class}) SmallMemberDto smallMemberDto,
-            BindingResult bindingResultMemberInfo,
-            HttpSession session,
-            RedirectAttributes redirectAttributes){
-        if(bindingResultMemberInfo.hasErrors()){
-            redirectAttributes.addFlashAttribute("member", smallMemberDto);
-            redirectAttributes.addFlashAttribute("errors", bindingResultMemberInfo.getAllErrors());
-            return "redirect:/login";
-        }
-        ReadMemberDto member = memberService.findByUsername(smallMemberDto.getUsername()).get();
-        session.setAttribute("member", member);
-        session.setMaxInactiveInterval(30*24*60*60);
-        return "redirect:/member/" + member.getUsername();
-    }
+
 }

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -24,4 +25,8 @@ public class Member {
     private String password;
     @ManyToOne
     private Family family;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    private List<Access> accesses;
+
 }
