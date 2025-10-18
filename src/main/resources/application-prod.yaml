@@ -1,6 +1,5 @@
 
 spring:
-
   thymeleaf:
     prefix: classpath:/templates/
     check-template-location: true
@@ -8,18 +7,18 @@ spring:
     name: CoHab
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/cohab
+    url: jdbc:postgresql://CoHab-db:5432/CoHab
     username: magofrays
-    password: labubu
+    password: lol
   jpa:
     properties.hibernate:
       show_sql: true
       format_sql: true
-      hbm2ddl.auto: validate
+      hbm2ddl.auto: create
 logging:
   level:
     root: INFO
 server:
-  port: 8081
+  port: 8080
   address: 0.0.0.0
 

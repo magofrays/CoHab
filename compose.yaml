@@ -1,9 +1,16 @@
 services:
-  postgres:
+  CoHab-db:
     image: 'postgres:latest'
     environment:
-      - 'POSTGRES_DB=mydatabase'
-      - 'POSTGRES_PASSWORD=secret'
-      - 'POSTGRES_USER=myuser'
+      - 'POSTGRES_DB=CoHab'
+      - 'POSTGRES_PASSWORD=lol'
+      - 'POSTGRES_USER=magofrays'
     ports:
       - '5432'
+  CoHab-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: 'cohab-app'
+    ports:
+      - 81:8080
