@@ -4,65 +4,94 @@ const API_CONFIG = {
     endpoints: {
         tasks: '/tasks',
         familyMembers: '/family/members',
-        addTask: '/tasks',
-        addMember: '/family/members'
+        member: {
+            create: '/member/create'
+        }
     }
 };
 
-// API service
-const apiService = {
-    async get(url) {
-        const response = await fetch(`${API_CONFIG.baseUrl}${url}`);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+// Базовые HTTP методы
+const httpService = {
+    async request(url, options = {}) {
+        const response = await fetch(`${API_CONFIG.baseUrl}${url}`, {
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            },
+            ...options
+        });
+
+        if (!response.ok) {
+            // Пробуем распарсить ошибку как JSON (для валидации)
+            try {
+                const errorData = await response.json();
+                throw errorData;
+            } catch {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+        }
+
         return await response.json();
+    },
+
+    async get(url) {
+        return this.request(url, { method: 'GET' });
     },
 
     async post(url, data) {
-        const response = await fetch(`${API_CONFIG.baseUrl}${url}`, {
+        return this.request(url, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
             body: JSON.stringify(data)
         });
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        return await response.json();
     },
 
     async put(url, data) {
-        const response = await fetch(`${API_CONFIG.baseUrl}${url}`, {
+        return this.request(url, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
             body: JSON.stringify(data)
         });
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        return await response.json();
     },
 
     async delete(url) {
-        const response = await fetch(`${API_CONFIG.baseUrl}${url}`, {
-            method: 'DELETE'
-        });
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        return await response.json();
-    },
+        return this.request(url, { method: 'DELETE' });
+    }
+};
 
-    // Специфичные методы API
+// Специфичные методы API
+const apiService = {
+    // Tasks
     async getTasks() {
-        return await this.get(API_CONFIG.endpoints.tasks);
-    },
-
-    async getFamilyMembers() {
-        return await this.get(API_CONFIG.endpoints.familyMembers);
+        return await httpService.get(API_CONFIG.endpoints.tasks);
     },
 
     async createTask(taskData) {
-        return await this.post(API_CONFIG.endpoints.addTask, taskData);
+        return await httpService.post(API_CONFIG.endpoints.tasks, taskData);
     },
 
+    // Family Members
+    async getFamilyMembers() {
+        return await httpService.get(API_CONFIG.endpoints.familyMembers);
+    },
+
+    async createFamilyMember(memberData) {
+        return await httpService.post(API_CONFIG.endpoints.familyMembers, memberData);
+    },
+
+    // Member Registration (новый эндпоинт)
     async createMember(memberData) {
-        return await this.post(API_CONFIG.endpoints.addMember, memberData);
+        return await httpService.post(API_CONFIG.endpoints.member.create, memberData);
+    },
+
+    // Общие методы для переиспользования
+    async updateTask(taskId, taskData) {
+        return await httpService.put(`${API_CONFIG.endpoints.tasks}/${taskId}`, taskData);
+    },
+
+    async deleteTask(taskId) {
+        return await httpService.delete(`${API_CONFIG.endpoints.tasks}/${taskId}`);
+    },
+
+    async deleteFamilyMember(memberId) {
+        return await httpService.delete(`${API_CONFIG.endpoints.familyMembers}/${memberId}`);
     }
 };
