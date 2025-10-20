@@ -9,15 +9,11 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-public class Access implements GrantedAuthority {
+public class Access {
     @Id
     private UUID uuid;
     private String name;
     @ManyToMany(mappedBy = "accesses")
     private List<Member> memberList;
 
-    @Override
-    public String getAuthority() {
-        return name;
-    }
 }

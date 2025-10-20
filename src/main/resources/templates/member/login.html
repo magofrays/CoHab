@@ -42,8 +42,6 @@
 
     <!-- Форма логина Spring Security -->
     <form th:action="@{/login}" method="post" class="space-y-6">
-        <!-- CSRF токен -->
-        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
         <!-- Username -->
         <div>

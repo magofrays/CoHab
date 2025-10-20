@@ -5,7 +5,8 @@ const API_CONFIG = {
         tasks: '/tasks',
         familyMembers: '/family/members',
         member: {
-            create: '/member/create'
+            create: '/member/create',
+            find: '/member/find/'
         }
     }
 };
@@ -59,39 +60,45 @@ const httpService = {
 
 // Специфичные методы API
 const apiService = {
-    // Tasks
-    async getTasks() {
-        return await httpService.get(API_CONFIG.endpoints.tasks);
+    // Tasks module
+    tasks: {
+        async getTasks() {
+            return await httpService.get(API_CONFIG.endpoints.tasks);
+        },
+
+        async createTask(taskData) {
+            return await httpService.post(API_CONFIG.endpoints.tasks, taskData);
+        },
+
+        async updateTask(taskId, taskData) {
+            return await httpService.put(`${API_CONFIG.endpoints.tasks}/${taskId}`, taskData);
+        },
+
+        async deleteTask(taskId) {
+            return await httpService.delete(`${API_CONFIG.endpoints.tasks}/${taskId}`);
+        }
+    },
+    // Family Members module
+    familyMembers: {
+        async getFamilyMembers() {
+            return await httpService.get(API_CONFIG.endpoints.familyMembers);
+        },
+        async createFamilyMember(memberData) {
+            return await httpService.post(API_CONFIG.endpoints.familyMembers, memberData);
+        },
+        async deleteFamilyMember(memberId) {
+            return await httpService.delete(`${API_CONFIG.endpoints.familyMembers}/${memberId}`);
+        }
     },
 
-    async createTask(taskData) {
-        return await httpService.post(API_CONFIG.endpoints.tasks, taskData);
-    },
+    // Member module
+    member: {
+        async findByUsername(username) {
+            return await httpService.get(`${API_CONFIG.endpoints.member.find}${username}`);
+        },
 
-    // Family Members
-    async getFamilyMembers() {
-        return await httpService.get(API_CONFIG.endpoints.familyMembers);
-    },
-
-    async createFamilyMember(memberData) {
-        return await httpService.post(API_CONFIG.endpoints.familyMembers, memberData);
-    },
-
-    // Member Registration (новый эндпоинт)
-    async createMember(memberData) {
-        return await httpService.post(API_CONFIG.endpoints.member.create, memberData);
-    },
-
-    // Общие методы для переиспользования
-    async updateTask(taskId, taskData) {
-        return await httpService.put(`${API_CONFIG.endpoints.tasks}/${taskId}`, taskData);
-    },
-
-    async deleteTask(taskId) {
-        return await httpService.delete(`${API_CONFIG.endpoints.tasks}/${taskId}`);
-    },
-
-    async deleteFamilyMember(memberId) {
-        return await httpService.delete(`${API_CONFIG.endpoints.familyMembers}/${memberId}`);
+        async createMember(memberData) {
+            return await httpService.post(API_CONFIG.endpoints.member.create, memberData);
+        }
     }
 };

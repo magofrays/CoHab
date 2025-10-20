@@ -18,7 +18,7 @@ const profile = {
                 throw new Error('Username not found in URL');
             }
 
-            const member = await apiService.getMemberByUsername(username);
+            const member = await apiService.member.findByUsername(username);
             this.currentMember = member;
             this.renderProfile(member);
 
@@ -149,3 +149,7 @@ const profile = {
         window.location.href = '/';
     }
 };
+
+document.addEventListener('DOMContentLoaded', function() {
+    profile.init();
+});

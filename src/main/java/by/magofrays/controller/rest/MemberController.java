@@ -39,7 +39,7 @@ public class MemberController {
         return ResponseEntity.ok(member);
     }
 
-    @GetMapping("/{username}")
+    @GetMapping("find/${username}")
     public ResponseEntity<ReadMemberDto> findByUsername(@ModelAttribute("username") String username){
         return ResponseEntity.ok(memberService.findByUsername(username).orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "NOT FOUND")));
     }
