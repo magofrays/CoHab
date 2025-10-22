@@ -1,11 +1,5 @@
 package by.magofrays.security;
-
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-
-import java.nio.file.attribute.UserPrincipal;
-import java.util.Collection;
 
 
 public class MemberPrincipalAuthToken extends AbstractAuthenticationToken {

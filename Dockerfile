@@ -1,4 +1,4 @@
-FROM gradle:8.0.2-jdk17 AS builder
+FROM gradle:8.7-jdk21 AS build-stage
 WORKDIR /app
 
 COPY build.gradle .
@@ -9,13 +9,14 @@ COPY src src/
 USER root
 RUN chown -R gradle:gradle /app
 USER gradle
-RUN gradle clean --refresh-dependencies
-RUN gradle build -x test --no-daemon
-RUN gradle clean build -x test --no-daemon
 
-FROM openjdk
+RUN gradle clean --no-daemon --stacktrace
+RUN gradle dependencies --no-daemon --info --stacktrace
+RUN gradle build -x test --no-daemon --stacktrace
+
+FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
-COPY --from=builder /app/build/libs/*.jar app.jar
+COPY --from=build-stage /app/build/libs/*.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]

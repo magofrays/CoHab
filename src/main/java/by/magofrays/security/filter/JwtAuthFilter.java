@@ -6,6 +6,7 @@ import by.magofrays.security.JwtToPrincipalMapper;
 import by.magofrays.security.MemberPrincipalAuthToken;
 import by.magofrays.service.MemberService;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

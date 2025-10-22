@@ -40,23 +40,18 @@ public class SecurityConfiguration {
         security
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session ->  session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
                         auth
                                 .requestMatchers("/admin/**").hasAuthority("ADMIN")
                                 .requestMatchers(
-                                        "/login",
-                                        "/register",
-                                        "api/member/create",
-                                        "/css/**",
-                                        "/js/**",
                                         "api/login",
                                         "api/register").permitAll()
 
                                 .anyRequest().authenticated())
 
-                .formLogin(AbstractHttpConfigurer::disable) // TODO : logout
-                .securityMatcher("/**");
+                .formLogin(AbstractHttpConfigurer::disable)
+                .securityMatcher("/api/**");
         return security.build();
     }
 

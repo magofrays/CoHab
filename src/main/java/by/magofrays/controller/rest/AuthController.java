@@ -34,4 +34,9 @@ public class AuthController {
                 .accessToken(token)
                 .build();
     }
+
+    @PostMapping("/registration") // TODO
+    public LoginResponse registration(@RequestBody @Validated SmallMemberDto loginMemberDto){
+        return LoginResponse.builder().build();
+    }
 }

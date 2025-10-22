@@ -1,16 +1,37 @@
+volumes:
+  postgres_data: {}
+
 services:
-  CoHab-db:
-    image: 'postgres:latest'
+  cohab-db:
+    image: 'postgres:alpine'
     environment:
-      - 'POSTGRES_DB=CoHab'
-      - 'POSTGRES_PASSWORD=lol'
+      - 'POSTGRES_DB=cohab'
+      - 'POSTGRES_PASSWORD=labubu'
       - 'POSTGRES_USER=magofrays'
     ports:
-      - '5432'
-  CoHab-app:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  cohab-back:
     build:
       context: .
       dockerfile: Dockerfile
-    image: 'cohab-app'
+      tags:
+        - cohab-backend
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    image: 'cohab-backend'
     ports:
-      - 81:8080
+      - 8080:8080
+    depends_on:
+      - cohab-db
+  cohab-front:
+    build:
+      context: ./frontend/cohab-app
+      dockerfile: Dockerfile
+      tags:
+        - cohab-frontend
+    image: 'cohab-frontend'
+    ports:
+      - 8081:80

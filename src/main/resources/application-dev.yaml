@@ -1,7 +1,4 @@
 spring:
-  thymeleaf:
-    prefix: classpath:/templates/
-    check-template-location: true
   application:
     name: CoHab
   datasource:
@@ -11,7 +8,7 @@ spring:
     password: labubu
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
