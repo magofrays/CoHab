@@ -29,4 +29,7 @@ public class Member {
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Access> accesses;
 
+    @OneToMany
+    private List<Task> createdTasks;
+
 }

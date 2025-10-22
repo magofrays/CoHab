@@ -1,10 +1,14 @@
 package by.magofrays.dto;
 
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 
-@Getter
+import java.time.LocalDateTime;
+
+@Data
 @Builder
 public class LoginResponse {
-    private final String accessToken;
+    String token;
+    String refreshToken;
+    String expiresAt;
 }

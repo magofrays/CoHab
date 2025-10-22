@@ -1,4 +1,4 @@
-package by.magofrays.controller.rest;
+package by.magofrays.controller;
 
 import by.magofrays.dto.PersonalInfoDto;
 import by.magofrays.dto.ReadMemberDto;

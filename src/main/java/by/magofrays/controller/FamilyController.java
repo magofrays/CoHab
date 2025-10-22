@@ -1,4 +1,4 @@
-package by.magofrays.controller.rest;
+package by.magofrays.controller;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController

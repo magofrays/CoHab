@@ -27,4 +27,6 @@ public class JwtIssuer {
                 .withClaim("a", principal.getAuthorities())
                 .sign(Algorithm.HMAC256(properties.getSecretKey()));
     }
+
+
 }

@@ -4,6 +4,7 @@ import by.magofrays.dto.PersonalInfoDto;
 import by.magofrays.dto.ReadMemberDto;
 import by.magofrays.dto.SmallMemberDto;
 import by.magofrays.entity.Member;
+import by.magofrays.security.MemberPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -25,9 +26,15 @@ public abstract class MemberMapper {
     @Mapping(target = "familyDto", source = "family")
     public abstract ReadMemberDto toDto(Member member);
 
+    @Mapping(target = "familyDto", ignore = true)
+    @Mapping(target = "personalInfoDto", ignore = true)
+    @Mapping(target = "uuid", source = "id")
+    public abstract ReadMemberDto memberDto(MemberPrincipal principal);
+
     @Mapping(target = "personalInfo", source = "personalInfoDto")
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "accesses", ignore = true)
     public abstract Member forCreate(SmallMemberDto createMemberDto, PersonalInfoDto personalInfoDto);
 
     @AfterMapping

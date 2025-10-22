@@ -14,7 +14,7 @@ public class MemberPrincipalAuthToken extends AbstractAuthenticationToken {
 
     @Override
     public Object getCredentials() {
-        return null;
+        return memberPrincipal.getAuthorities();
     }
 
     @Override

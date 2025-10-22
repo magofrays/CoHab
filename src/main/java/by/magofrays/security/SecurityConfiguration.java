@@ -45,13 +45,13 @@ public class SecurityConfiguration {
                         auth
                                 .requestMatchers("/admin/**").hasAuthority("ADMIN")
                                 .requestMatchers(
-                                        "api/login",
-                                        "api/register").permitAll()
+                                        "/api/login",
+                                        "/api/registration").permitAll()
 
                                 .anyRequest().authenticated())
 
                 .formLogin(AbstractHttpConfigurer::disable)
-                .securityMatcher("/api/**");
+                .securityMatcher("/**");
         return security.build();
     }
 

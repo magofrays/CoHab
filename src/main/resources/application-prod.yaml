@@ -24,3 +24,16 @@ server:
 security:
   jwt:
     secret-key: iluvnastu
+  cors:
+    allowed-origins:
+      - "http://localhost:5173"
+      - "http://cohab-front:8081"
+    allowed-methods:
+      - "GET"
+      - "POST"
+      - "PUT"
+      - "DELETE"
+      - "OPTIONS"
+    allowed-headers: "*"
+    allow-credentials: true
+    max-age: 3600

@@ -15,6 +15,7 @@ public class AuthService implements UserDetailsService {
     private final MemberRepository memberRepository;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        System.out.println("here");
         return memberRepository.findByUsername(username).map(member -> MemberPrincipal.builder()
                 .id(member.getUuid())
                 .username(member.getUsername())
