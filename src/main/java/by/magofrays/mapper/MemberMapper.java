@@ -2,10 +2,11 @@ package by.magofrays.mapper;
 
 import by.magofrays.dto.PersonalInfoDto;
 import by.magofrays.dto.ReadMemberDto;
+import by.magofrays.dto.RegistrationDto;
 import by.magofrays.dto.SmallMemberDto;
 import by.magofrays.entity.Member;
+import by.magofrays.entity.PersonalInfo;
 import by.magofrays.security.MemberPrincipal;
-import lombok.RequiredArgsConstructor;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -17,36 +18,36 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 
 @Component
-@Mapper(componentModel = "spring", uses = {PersonalInfoMapper.class, FamilyMapper.class})
+@Mapper(componentModel = "spring", uses = {PersonalInfoMapper.class, FamilyMapper.class, AccessMapper.class})
 public abstract class MemberMapper {
     @Autowired
     protected PasswordEncoder passwordEncoder;
 
     @Mapping(target = "personalInfoDto", source = "personalInfo")
-    @Mapping(target = "familyDto", source = "family")
+    @Mapping(target = "familyDtos", source = "families")
+    @Mapping(target = "accesses", source = "accesses")
     public abstract ReadMemberDto toDto(Member member);
 
-    @Mapping(target = "familyDto", ignore = true)
     @Mapping(target = "personalInfoDto", ignore = true)
-    @Mapping(target = "uuid", source = "id")
     public abstract ReadMemberDto memberDto(MemberPrincipal principal);
 
-    @Mapping(target = "personalInfo", source = "personalInfoDto")
-    @Mapping(target = "password", ignore = true)
-    @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "accesses", ignore = true)
-    public abstract Member forCreate(SmallMemberDto createMemberDto, PersonalInfoDto personalInfoDto);
+    @Mapping(target = "personalInfo", expression = "java(mapPersonalInfo(registrationDto))")
+    @Mapping(target = "password", expression = "java(passwordEncoder.encode(registrationDto.getPassword()))")
+    public abstract Member forCreate(RegistrationDto registrationDto);
 
-    @AfterMapping
-    protected void generateUuids(@MappingTarget Member member) {
-        member.setUuid(UUID.randomUUID());
-        if (member.getPersonalInfo() != null) {
-            member.getPersonalInfo().setUuid(UUID.randomUUID());
-        }
+    protected PersonalInfo mapPersonalInfo(RegistrationDto registrationDto) {
+        return PersonalInfo.builder()
+                .firstname(registrationDto.getFirstname())
+                .lastname(registrationDto.getLastname())
+                .birthDate(registrationDto.getBirthDate())
+                .build();
     }
 
     @AfterMapping
-    protected void createHashPassword(@MappingTarget Member member, SmallMemberDto createMemberDto) {
-        member.setPassword(passwordEncoder.encode(createMemberDto.getPassword()));
+    protected void generateUuids(@MappingTarget Member member) {
+        member.setId(UUID.randomUUID());
+        if (member.getPersonalInfo() != null) {
+            member.getPersonalInfo().setId(UUID.randomUUID());
+        }
     }
 }

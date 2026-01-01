@@ -9,7 +9,7 @@ import java.util.UUID;
 @Value
 @Data
 public class AccessDto implements GrantedAuthority {
-    UUID uuid;
+    UUID id;
     String name;
 
     @Override

@@ -1,7 +1,9 @@
 package by.magofrays.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,8 +19,11 @@ import java.util.UUID;
 @NoArgsConstructor
 public class PersonalInfo {
     @Id
-    UUID uuid;
+    UUID id;
     String firstname;
     String lastname;
     LocalDate birthDate;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    Member member;
 }

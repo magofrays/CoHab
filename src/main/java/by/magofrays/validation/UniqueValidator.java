@@ -15,7 +15,6 @@ public class UniqueValidator implements ConstraintValidator<Unique, Object> {
 
     @PersistenceContext
     private EntityManager entityManager;
-
     private Class<?> entityClass;
     private String fieldName;
 

@@ -8,9 +8,9 @@ import java.util.UUID;
 @Value
 @Builder
 public class ReadMemberDto {
-    UUID uuid;
+    UUID id;
     String username;
     PersonalInfoDto personalInfoDto;
-    FamilyDto familyDto;
+    List<ReadFamilyDto> familyDtos;
     List<AccessDto> accesses;
 }

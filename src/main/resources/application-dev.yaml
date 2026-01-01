@@ -16,7 +16,7 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 logging:
   level:
-    root: INFO
+    org.springframework.security: info
 server:
   port: 8080
   address: 0.0.0.0
@@ -33,6 +33,7 @@ security:
       - "PUT"
       - "DELETE"
       - "OPTIONS"
-    allowed-headers: "*"
+    allowed-headers:
+      - "*"
     allow-credentials: true
     max-age: 3600

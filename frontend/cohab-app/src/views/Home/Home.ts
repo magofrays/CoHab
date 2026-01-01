@@ -1,4 +1,7 @@
 import { ref, onMounted } from 'vue'
+import { hasFamily, getFamilyMembers, createFamily } from '@/services/api'
+import type { ReadMemberDto, ReadFamilyDto } from '@/types/api'
+import type { ApiError } from '@/types/api'
 
 interface Task {
   id: string
@@ -9,29 +12,16 @@ interface Task {
   dueDate: string
 }
 
-interface PersonalInfoDto {
-  firstname: string
-  lastname: string
-  birthDate: string
-}
-
-interface FamilyDto {
-  familyName: string
-}
-
-interface FamilyMember {
-  uuid: string
-  username: string
-  personalInfoDto: PersonalInfoDto
-  familyDto: FamilyDto
-}
-
 export default {
   name: 'HomeView',
   setup() {
     const loading = ref(false)
     const tasks = ref<Task[]>([])
-    const familyMembers = ref<FamilyMember[]>([])
+    const familyMembers = ref<ReadMemberDto[]>([])
+    const userHasFamily = ref<boolean | null>(null)
+    const showCreateFamilyForm = ref(false)
+    const newFamilyName = ref('')
+    const creatingFamily = ref(false)
 
     const formatDate = (dateString: string): string => {
       if (!dateString) return 'Не указана'
@@ -39,18 +29,35 @@ export default {
       return date.toLocaleDateString('ru-RU')
     }
 
+    const formatFamilyNames = (families?: ReadFamilyDto[]): string => {
+      if (!families || families.length === 0) return ''
+      return families.map((f: ReadFamilyDto) => f.familyName).join(', ')
+    }
+
     const showError = (message: string) => {
       alert(`Ошибка: ${message}`)
+    }
+
+    const checkHasFamily = async (): Promise<void> => {
+      try {
+        loading.value = true
+        userHasFamily.value = await hasFamily()
+        if (userHasFamily.value) {
+          await loadFamilyMembers()
+        } else {
+          showCreateFamilyForm.value = true
+        }
+      } catch (error) {
+        const apiError = error as ApiError
+        showError(apiError.message || 'Не удалось проверить наличие семьи')
+      } finally {
+        loading.value = false
+      }
     }
 
     const loadTasks = async (): Promise<void> => {
       try {
         loading.value = true
-        // Замените на ваш API вызов
-        // const response = await fetch('/api/tasks')
-        // tasks.value = await response.json()
-        
-        // Временные mock данные
         tasks.value = [
           {
             id: '1',
@@ -71,35 +78,38 @@ export default {
     const loadFamilyMembers = async (): Promise<void> => {
       try {
         loading.value = true
-        // Замените на ваш API вызов
-        // const response = await fetch('/api/family/members')
-        // familyMembers.value = await response.json()
-        
-        // Временные mock данные
-        familyMembers.value = [
-          {
-            uuid: '1',
-            username: 'papa',
-            personalInfoDto: {
-              firstname: 'Иван',
-              lastname: 'Иванов',
-              birthDate: '1980-01-01'
-            },
-            familyDto: {
-              familyName: 'Ивановы'
-            }
-          }
-        ]
+        familyMembers.value = await getFamilyMembers()
       } catch (error) {
-        showError('Не удалось загрузить членов семьи')
+        const apiError = error as ApiError
+        showError(apiError.message || 'Не удалось загрузить членов семьи')
       } finally {
         loading.value = false
       }
     }
 
+    const handleCreateFamily = async (): Promise<void> => {
+      if (!newFamilyName.value.trim()) {
+        showError('Введите название семьи')
+        return
+      }
+
+      try {
+        creatingFamily.value = true
+        const createdFamily: ReadFamilyDto = await createFamily(newFamilyName.value.trim())
+        userHasFamily.value = true
+        showCreateFamilyForm.value = false
+        newFamilyName.value = ''
+        await loadFamilyMembers()
+      } catch (error) {
+        const apiError = error as ApiError
+        showError(apiError.message || 'Не удалось создать семью')
+      } finally {
+        creatingFamily.value = false
+      }
+    }
+
     const toggleTask = async (taskId: string): Promise<void> => {
       try {
-        // await fetch(`/api/tasks/${taskId}/toggle`, { method: 'PUT' })
         await loadTasks()
       } catch (error) {
         showError('Ошибка при обновлении задачи')
@@ -109,7 +119,6 @@ export default {
     const deleteTask = async (taskId: string): Promise<void> => {
       if (confirm('Удалить задачу?')) {
         try {
-          // await fetch(`/api/tasks/${taskId}`, { method: 'DELETE' })
           await loadTasks()
         } catch (error) {
           showError('Ошибка при удалении задачи')
@@ -124,10 +133,10 @@ export default {
     const deleteMember = async (memberId: string): Promise<void> => {
       if (confirm('Удалить члена семьи?')) {
         try {
-          // await fetch(`/api/family/members/${memberId}`, { method: 'DELETE' })
           await loadFamilyMembers()
         } catch (error) {
-          showError('Ошибка при удалении члена семьи')
+          const apiError = error as ApiError
+          showError(apiError.message || 'Ошибка при удалении члена семьи')
         }
       }
     }
@@ -141,15 +150,20 @@ export default {
     }
 
     onMounted(() => {
+      checkHasFamily()
       loadTasks()
-      loadFamilyMembers()
     })
 
     return {
       loading,
       tasks,
       familyMembers,
+      userHasFamily,
+      showCreateFamilyForm,
+      newFamilyName,
+      creatingFamily,
       formatDate,
+      formatFamilyNames,
       loadTasks,
       loadFamilyMembers,
       toggleTask,
@@ -157,7 +171,8 @@ export default {
       editMember,
       deleteMember,
       showAddTaskForm,
-      showAddMemberForm
+      showAddMemberForm,
+      handleCreateFamily
     }
   }
 }

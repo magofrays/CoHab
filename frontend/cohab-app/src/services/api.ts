@@ -1,4 +1,4 @@
-import type { ProblemDetail, ApiError } from '@/types/api';
+import type { ProblemDetail, ApiError, ReadMemberDto, ReadFamilyDto, CreateFamilyDto } from '@/types/api';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 async function parseProblemDetail(response: Response): Promise<ProblemDetail> {
@@ -90,3 +90,23 @@ export const apiService = {
     return response;
   },
 };
+
+// Family and Member API functions
+export async function hasFamily(): Promise<boolean> {
+  const response = await apiService.post('member/hasFamily', null);
+  return await response.json();
+}
+
+export async function getFamilyMembers(): Promise<ReadMemberDto[]> {
+  const response = await apiService.get('family/members');
+  return await response.json();
+}
+
+export async function createFamily(familyName: string): Promise<ReadFamilyDto> {
+  if (!familyName || !familyName.trim()) {
+    throw new Error('Family name is required');
+  }
+  const data: CreateFamilyDto = { familyName: familyName.trim() };
+  const response = await apiService.post('family/create', data);
+  return await response.json();
+}

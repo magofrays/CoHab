@@ -29,3 +29,34 @@ export interface ApiError {
   status: number;
   problem?: ProblemDetail;
 }
+
+// Family and Member DTOs
+export interface PersonalInfoDto {
+  firstname?: string;
+  lastname?: string;
+  birthDate?: string;
+}
+
+export interface AccessDto {
+  id?: string;
+  name?: string;
+  // Добавьте другие поля AccessDto если необходимо
+}
+
+export interface ReadFamilyDto {
+  id: string;
+  familyName: string;
+  createdBy: string;
+}
+
+export interface ReadMemberDto {
+  id: string;
+  username: string;
+  personalInfoDto?: PersonalInfoDto;
+  familyDtos?: ReadFamilyDto[];
+  accesses?: AccessDto[];
+}
+
+export interface CreateFamilyDto {
+  familyName: string;
+}

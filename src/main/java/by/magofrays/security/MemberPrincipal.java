@@ -2,8 +2,10 @@ package by.magofrays.security;
 
 
 import by.magofrays.dto.AccessDto;
+import by.magofrays.dto.ReadFamilyDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,6 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Builder
+@Data
 public class MemberPrincipal implements UserDetails {
     @Getter
     private UUID id;

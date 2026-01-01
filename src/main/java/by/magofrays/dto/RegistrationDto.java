@@ -17,16 +17,13 @@ public class RegistrationDto {
     @Unique(message = "Пользователь с таким никнеймом уже существует!",
             entityClass = Member.class, fieldName = "username")
     @NotBlank(message = "Никнейм не может быть пустым!")
-    String username;
+    private String username;
     @NotBlank(message = "Введите пароль!")
-    String password;
+    private String password;
     @NotBlank(message = "Заполните имя!")
-    String firstname;
+    private String firstname;
     @NotBlank(message = "Заполните фамилию!")
-    String lastname;
-    @NotNull(message = "Дата рождения не должна быть пустой!")
-    @DateTimeFormat(pattern = "dd-MM-yyyy")
-    LocalDate birthDate;
-
-
+    private String lastname;
+    @NotNull(message = "Дата рождения не должна быть пустой!") // из-за этой хуйни ломается все))
+    private LocalDate birthDate;
 }

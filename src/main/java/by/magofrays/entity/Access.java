@@ -11,7 +11,7 @@ import java.util.UUID;
 @Entity
 public class Access {
     @Id
-    private UUID uuid;
+    private UUID id;
     private String name;
     @ManyToMany(mappedBy = "accesses")
     private List<Member> memberList;

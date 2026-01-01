@@ -1,13 +1,12 @@
 package by.magofrays.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,13 +17,22 @@ import java.util.UUID;
 @NoArgsConstructor
 public class Family {
     @Id
-    private UUID uuid;
+    private UUID id;
     private String familyName;
-    @OneToMany(fetch = FetchType.LAZY)
-    private List<Member> members;
+    @ManyToMany
+    @JoinTable(
+            name = "family_members",
+            joinColumns = @JoinColumn(name = "family_id"),
+            inverseJoinColumns = @JoinColumn(name = "member_id")
+    )
+    @Builder.Default
+    private List<Member> members = new ArrayList<>();
+
+    @OneToOne
+    private Member createdBy;
 
     public void addMember(Member member){
-        member.setFamily(this);
+        member.getFamilies().add(this);
         members.add(member);
     }
 }

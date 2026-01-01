@@ -7,14 +7,20 @@ const router = createRouter({
     {
       path: '/login',
       name: 'Login',
-      component: () => import('../views/Login/Login.vue'),
-      meta: { requiresAuth: false } // 🔥 Не требует авторизации
+      component: () => import('@/views/Login/Login.vue'),
+      meta: { requiresAuth: false }
+    },
+    {
+      path: '/registration',
+      name: 'Registration',
+      component: () => import('@/views/Registration/Registration.vue'),
+      meta: { requiresAuth: false }
     },
     {
       path: '/',
       name: 'Home',
-      component: () => import('../views/Home/Home.vue'),
-      meta: { requiresAuth: true } // 🔥 Требует авторизации
+      component: () => import('@/views/Home/Home.vue'),
+      meta: { requiresAuth: true }
     }
   ],
 })

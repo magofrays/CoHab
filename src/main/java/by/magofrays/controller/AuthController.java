@@ -19,7 +19,7 @@ import java.time.Instant;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/auth")
 public class AuthController {
     private final JwtIssuer jwtIssuer;
     private final JwtDecoder jwtDecoder;
@@ -45,7 +45,7 @@ public class AuthController {
     public LoginResponse registration(@RequestBody @Validated RegistrationDto registrationDto){
         var member = memberService.createMember(registrationDto);
         var principal = MemberPrincipal.builder()
-                .id(member.getUuid())
+                .id(member.getId())
                 .username(member.getUsername())
                 .accesses(member.getAccesses())
                 .build();

@@ -17,7 +17,7 @@ public class AuthService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         System.out.println("here");
         return memberRepository.findByUsername(username).map(member -> MemberPrincipal.builder()
-                .id(member.getUuid())
+                .id(member.getId())
                 .username(member.getUsername())
                 .accesses(member.getAccesses().stream().map(accessMapper::toDto).toList())
                 .password(member.getPassword())

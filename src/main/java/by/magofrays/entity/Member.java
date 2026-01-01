@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,7 +15,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class Member {
     @Id
-    private UUID uuid;
+    private UUID id;
 
     private String username;
 
@@ -23,13 +24,26 @@ public class Member {
     private PersonalInfo personalInfo;
 
     private String password;
-    @ManyToOne
-    private Family family;
+
+    @ManyToMany(mappedBy = "members")
+    @Builder.Default
+    private List<Family> families = new ArrayList<>();;
+
+    @OneToOne(mappedBy = "createdBy")
+    private Family createdFamily;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    private List<Access> accesses;
+    @JoinTable(
+            name = "members_accesses",
+            joinColumns = @JoinColumn(name = "member_id"),
+            inverseJoinColumns = @JoinColumn(name = "access_id")
+    )
+    @Builder.Default
+    private List<Access> accesses = new ArrayList<>();;
 
-    @OneToMany
+    @OneToMany(mappedBy = "createdBy")
     private List<Task> createdTasks;
 
+    @OneToMany(mappedBy = "issuedTo")
+    private List<Task> issuedTasks;
 }
