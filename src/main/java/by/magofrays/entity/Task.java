@@ -13,7 +13,6 @@ import java.util.UUID;
 @Data
 public class Task {
     @Id
-    @org.hibernate.validator.constraints.UUID
     private UUID id;
     private String taskName;
     private String description;

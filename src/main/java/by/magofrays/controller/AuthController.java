@@ -4,6 +4,7 @@ import by.magofrays.dto.LoginResponse;
 import by.magofrays.dto.ReadMemberDto;
 import by.magofrays.dto.RegistrationDto;
 import by.magofrays.dto.SmallMemberDto;
+import by.magofrays.entity.SuperRole;
 import by.magofrays.security.JwtDecoder;
 import by.magofrays.security.JwtIssuer;
 import by.magofrays.security.MemberPrincipal;
@@ -47,7 +48,7 @@ public class AuthController {
         var principal = MemberPrincipal.builder()
                 .id(member.getId())
                 .username(member.getUsername())
-                .accesses(member.getAccesses())
+                .superRole(SuperRole.BAD_USER)
                 .build();
         var token = jwtIssuer.issue(principal);
         return LoginResponse.builder().token(token).build();

@@ -23,6 +23,7 @@ server:
 security:
   jwt:
     secret-key: iluvnastu
+    expires-at: 86400
   cors:
     allowed-origins:
       - "http://localhost:5173"

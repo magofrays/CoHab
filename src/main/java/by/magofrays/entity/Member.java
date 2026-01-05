@@ -4,9 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Data
 @Builder
@@ -19,31 +17,39 @@ public class Member {
 
     private String username;
 
-    @Setter
     @OneToOne(fetch = FetchType.LAZY)
     private PersonalInfo personalInfo;
 
     private String password;
 
-    @ManyToMany(mappedBy = "members")
+    @OneToMany(mappedBy = "member")
     @Builder.Default
-    private List<Family> families = new ArrayList<>();;
+    private List<FamilyMember> familyMembers = new ArrayList<>();
 
-    @OneToOne(mappedBy = "createdBy")
-    private Family createdFamily;
+    private SuperRole superRole;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "members_accesses",
-            joinColumns = @JoinColumn(name = "member_id"),
-            inverseJoinColumns = @JoinColumn(name = "access_id")
-    )
+    @OneToMany(mappedBy = "createdBy")
     @Builder.Default
-    private List<Access> accesses = new ArrayList<>();;
+    private List<Family> createdFamilies = new ArrayList<>();
 
     @OneToMany(mappedBy = "createdBy")
     private List<Task> createdTasks;
 
     @OneToMany(mappedBy = "issuedTo")
     private List<Task> issuedTasks;
+
+    public Map<UUID, List<Access>> getFamilyAccesses() {
+        Map<UUID, List<Access>> accesses = new HashMap<>();
+
+        for (FamilyMember familyMember : familyMembers) {
+            if (familyMember.getFamily() != null && familyMember.getRoles() != null) {
+                UUID familyId = familyMember.getFamily().getId();
+                List<Access> roleAccesses = familyMember.getRoles().stream().map(Role::getAccessList).flatMap(List::stream).toList();
+                if (!roleAccesses.isEmpty()) {
+                    accesses.put(familyId, roleAccesses);
+                }
+            }
+        }
+        return accesses;
+    }
 }

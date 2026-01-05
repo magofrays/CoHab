@@ -1,19 +1,22 @@
 package by.magofrays.dto;
+
 import by.magofrays.entity.Access;
 import by.magofrays.entity.Role;
-import by.magofrays.entity.SuperRole;
 import lombok.Builder;
-import lombok.Value;
+import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-@Value
+@Data
 @Builder
-public class ReadMemberDto {
+public class ReadFamilyMemberDto {
     UUID id;
     String username;
     PersonalInfoDto personalInfoDto;
-    List<ReadFamilyDto> familyDtos;
-    SuperRole superRole;
+    ReadFamilyDto familyDto;
+    List<Role> roles;
+    List<Access> accessList;
+    private LocalDateTime addedAt;
 }

@@ -18,21 +18,19 @@ import java.util.UUID;
 public class Family {
     @Id
     private UUID id;
-    private String familyName;
-    @ManyToMany
-    @JoinTable(
-            name = "family_members",
-            joinColumns = @JoinColumn(name = "family_id"),
-            inverseJoinColumns = @JoinColumn(name = "member_id")
-    )
-    @Builder.Default
-    private List<Member> members = new ArrayList<>();
 
-    @OneToOne
+    private String familyName;
+
+    @OneToMany
+    @Builder.Default
+    private List<FamilyMember> members = new ArrayList<>();
+
+    @ManyToOne
     private Member createdBy;
 
     public void addMember(Member member){
-        member.getFamilies().add(this);
-        members.add(member);
+        var familyMember = FamilyMember.builder().member(member).family(this).build();
+        member.getFamilyMembers().add(familyMember);
+        members.add(familyMember);
     }
 }

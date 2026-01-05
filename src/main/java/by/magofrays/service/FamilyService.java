@@ -2,8 +2,10 @@ package by.magofrays.service;
 
 import by.magofrays.dto.CreateFamilyDto;
 import by.magofrays.dto.ReadFamilyDto;
+import by.magofrays.dto.ReadFamilyMemberDto;
 import by.magofrays.dto.ReadMemberDto;
 import by.magofrays.entity.Family;
+import by.magofrays.entity.FamilyMember;
 import by.magofrays.entity.Member;
 import by.magofrays.exception.BusinessException;
 import by.magofrays.exception.ErrorCode;
@@ -29,12 +31,12 @@ public class FamilyService {
     private final FamilyMapper familyMapper;
     private final MemberRepository memberRepository;
 
-    public List<ReadMemberDto> getFamilyMembersByMemberId(UUID memberId){
-        return  memberRepository
+    public List<ReadFamilyMemberDto> getFamilyMembersByMemberId(UUID memberId){
+        return memberRepository
                 .findById(memberId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND))
-                .getFamilies()
-                .stream()
+                .getFamilyMembers()
+                .stream().map(FamilyMember::getFamily)
                 .map(Family::getMembers)
                 .flatMap(Collection::stream)
                 .map(memberMapper::toDto)

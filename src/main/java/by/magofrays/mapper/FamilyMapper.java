@@ -27,6 +27,7 @@ public abstract class FamilyMapper {
 
     @Mapping(target = "createdBy", expression = "java(family.getCreatedBy().getId())")
     public abstract ReadFamilyDto toDto(Family family);
+
     @Mapping(target = "createdBy", ignore = true)
     public abstract Family toEntity(CreateFamilyDto createFamilyDto);
 

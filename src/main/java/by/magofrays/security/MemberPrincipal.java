@@ -1,17 +1,16 @@
 package by.magofrays.security;
 
 
-import by.magofrays.dto.AccessDto;
-import by.magofrays.dto.ReadFamilyDto;
+import by.magofrays.entity.Access;
+import by.magofrays.entity.SuperRole;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Builder
@@ -22,11 +21,12 @@ public class MemberPrincipal implements UserDetails {
     private String username;
     @JsonIgnore
     private String password;
-    private List<AccessDto> accesses;
+    private SuperRole superRole;
+    private Map<UUID, List<Access>> familyAccesses;
 
     @Override
-    public List<AccessDto> getAuthorities() {
-        return accesses;
+    public List<SuperRole> getAuthorities() {
+        return List.of(superRole);
     }
 
     @Override
@@ -39,23 +39,4 @@ public class MemberPrincipal implements UserDetails {
         return username;
     }
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
 }

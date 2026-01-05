@@ -1,31 +1,33 @@
 package by.magofrays.mapper;
 
-import by.magofrays.dto.PersonalInfoDto;
-import by.magofrays.dto.ReadMemberDto;
-import by.magofrays.dto.RegistrationDto;
-import by.magofrays.dto.SmallMemberDto;
+import by.magofrays.dto.*;
+import by.magofrays.entity.FamilyMember;
 import by.magofrays.entity.Member;
 import by.magofrays.entity.PersonalInfo;
+import by.magofrays.entity.Role;
 import by.magofrays.security.MemberPrincipal;
-import org.mapstruct.AfterMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
+import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.UUID;
 
 @Component
-@Mapper(componentModel = "spring", uses = {PersonalInfoMapper.class, FamilyMapper.class, AccessMapper.class})
+@Mapper(componentModel = "spring", uses = {PersonalInfoMapper.class, FamilyMapper.class})
 public abstract class MemberMapper {
     @Autowired
     protected PasswordEncoder passwordEncoder;
+    @Autowired
+    protected PersonalInfoMapper personalInfoMapper;
+
+    @Mapping(target = "personalInfoDto", ignore = true)
+    @Mapping(target = "familyDto", source = "family")
+    @Mapping(target = "accessList", ignore = true)
+    public abstract ReadFamilyMemberDto toDto(FamilyMember member);
 
     @Mapping(target = "personalInfoDto", source = "personalInfo")
-    @Mapping(target = "familyDtos", source = "families")
-    @Mapping(target = "accesses", source = "accesses")
     public abstract ReadMemberDto toDto(Member member);
 
     @Mapping(target = "personalInfoDto", ignore = true)
@@ -42,6 +44,13 @@ public abstract class MemberMapper {
                 .birthDate(registrationDto.getBirthDate())
                 .build();
     }
+
+    @AfterMapping
+    protected void convertRolesToAccesses(@MappingTarget ReadFamilyMemberDto familyMemberDto, @Context FamilyMember familyMember){
+        familyMemberDto.setAccessList(familyMember.getRoles().stream().map(Role::getAccessList).flatMap(List::stream).toList());
+        familyMemberDto.setPersonalInfoDto(personalInfoMapper.toDto(familyMember.getMember().getPersonalInfo()));
+    }
+
 
     @AfterMapping
     protected void generateUuids(@MappingTarget Member member) {

@@ -1,6 +1,5 @@
 package by.magofrays.security.filter;
 
-import by.magofrays.security.AuthService;
 import by.magofrays.security.JwtDecoder;
 import by.magofrays.security.JwtToPrincipalMapper;
 import by.magofrays.security.MemberPrincipalAuthToken;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.nio.file.attribute.UserPrincipal;
 import java.util.Optional;
 
 @Component

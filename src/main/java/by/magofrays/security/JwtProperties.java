@@ -11,5 +11,5 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("security.jwt")
 public class JwtProperties {
     private String secretKey;
-
+    private Integer ExpiresAt;
 }

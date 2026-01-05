@@ -1,5 +1,6 @@
 package by.magofrays.service;
 import by.magofrays.dto.*;
+import by.magofrays.entity.FamilyMember;
 import by.magofrays.entity.Member;
 import by.magofrays.entity.PersonalInfo;
 import by.magofrays.exception.BusinessException;
@@ -33,22 +34,15 @@ public class MemberService{
     }
 
     public List<ReadFamilyDto> findMemberFamilies(UUID memberId){
-        return memberRepository
-                .findById(memberId)
-                .map(Member::getFamilies)
-                .map(families ->
-                        families
-                                .stream()
-                                .map(familyMapper::toDto)
-                                .toList()
-                )
-                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND));
+        var member = memberRepository
+                .findById(memberId).orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND));
+        return member.getFamilyMembers().stream().map(FamilyMember::getFamily).map(familyMapper::toDto).toList();
     }
 
     public boolean memberHasFamily(UUID memberID){
         return !memberRepository
                 .findById(memberID)
-                .map(Member::getFamilies).map(List::isEmpty)
+                .map(Member::getFamilyMembers).map(List::isEmpty)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND));
     }
 
