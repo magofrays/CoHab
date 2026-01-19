@@ -1,15 +1,15 @@
 package by.magofrays.controller;
 
-import by.magofrays.dto.CreateTaskDto;
+import by.magofrays.dto.CreateUpdateTaskDto;
 import by.magofrays.dto.ReadTaskDto;
 import by.magofrays.security.MemberPrincipal;
 import by.magofrays.service.TaskService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("api/tasks")
@@ -23,9 +23,23 @@ public class TaskController {
     }
 
     @PostMapping("/create")
-    public UUID createTask(@AuthenticationPrincipal MemberPrincipal principal,
-                           CreateTaskDto createTaskDto){
+    @PreAuthorize("""
+        hasAuthority('USER') && hasPermission(createTaskDto.familyName, 'family', CREATE_TASK)
+        && ((createTaskDto.issuedTo() == null) || (hasPermission(createTaskDto.familyName, 'family', ASSIGN_TASK)))
+    """)
+    public ReadTaskDto createTask(@AuthenticationPrincipal MemberPrincipal principal,
+                           @RequestBody CreateUpdateTaskDto createTaskDto){
         createTaskDto.setCreatedBy(principal.getId());
         return taskService.createTask(createTaskDto);
     }
+
+//    @PutMapping(
+//            """
+//                has
+//            """
+//    )
+//    public ReadTaskDto changeTask(@AuthenticationPrincipal MemberPrincipal principal,
+//                                  @RequestBody CreateUpdateTaskDto updateTaskDto) {
+//
+//    }
 }

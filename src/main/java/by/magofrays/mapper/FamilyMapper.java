@@ -1,14 +1,10 @@
 package by.magofrays.mapper;
 
 import by.magofrays.dto.CreateFamilyDto;
-import by.magofrays.dto.CreateTaskDto;
 import by.magofrays.dto.ReadFamilyDto;
 import by.magofrays.entity.Family;
-import by.magofrays.entity.Member;
-import by.magofrays.entity.Task;
 import by.magofrays.exception.BusinessException;
 import by.magofrays.exception.ErrorCode;
-import by.magofrays.repository.FamilyRepository;
 import by.magofrays.repository.MemberRepository;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -35,7 +31,7 @@ public abstract class FamilyMapper {
     void mapCreatedBy(@MappingTarget Family family, CreateFamilyDto createFamilyDto){
         family.setCreatedBy(memberRepository
                 .findById(createFamilyDto.getCreatedBy())
-                .orElseThrow( () -> new BusinessException(ErrorCode.NOT_FOUND)
+                .orElseThrow( () -> new BusinessException(ErrorCode.NOT_FOUND, "Пользователь с id: "+ createFamilyDto.getCreatedBy() +" не существует.")
                 ));
     }
 

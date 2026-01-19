@@ -16,7 +16,9 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 logging:
   level:
-    org.springframework.security: info
+    org.springframework.security: debug
+    org.springframework.validation: DEBUG
+    by.magofrays: debug
 server:
   port: 8080
   address: 0.0.0.0

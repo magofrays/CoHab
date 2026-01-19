@@ -25,7 +25,7 @@ public class FamilyPermissionEvaluator implements PermissionEvaluator {
             return false;
         }
         if(Objects.equals(targetType, "family")) {
-            var family = familyRepository.findFamilyByFamilyName((String) targetId);
+            var family = familyRepository.findFamilyByFamilyName((String) targetId); //todo лучше из бд получать access
             if (family.isEmpty()) {
                 return false;
             }

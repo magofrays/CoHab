@@ -1,6 +1,7 @@
 package by.magofrays.security;
 
 import by.magofrays.entity.Access;
+import by.magofrays.entity.SuperRole;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,6 +23,7 @@ public class JwtToPrincipalMapper {
         return MemberPrincipal.builder()
                 .id(UUID.fromString(jwt.getSubject()))
                 .username(jwt.getClaim("username").asString())
+                .superRole(SuperRole.valueOf(jwt.getClaim("superRole").asString()))
                 .familyAccesses(extractAuthoritiesFromJwt(jwt)).build();
     }
 

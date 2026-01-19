@@ -25,18 +25,20 @@ import java.util.List;
 public class MemberController {
 
     private final MemberService memberService;
-    @GetMapping()
-//    @PreAuthorize("hasRole('ADMIN') || authentication.principal.getUsername().equals(#username)")
+    @GetMapping("/")
+    @PreAuthorize("hasAuthority('USER')")
     public ResponseEntity<ReadMemberDto> findByUsername(@AuthenticationPrincipal MemberPrincipal principal){
-        return ResponseEntity.ok(memberService.findByUsername(principal.getUsername()).orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND)));
+        return ResponseEntity.ok(memberService.findByUsername(principal.getUsername())
+                .orElseThrow(() ->
+                        new BusinessException(ErrorCode.NOT_FOUND, "Пользователь с никнеймом: "+ principal.getUsername() +" не существует.")));
     }
 
-    @PostMapping("/families")
+    @GetMapping("/families")
     public List<ReadFamilyDto> getMemberFamilies(@AuthenticationPrincipal MemberPrincipal principal){
         return memberService.findMemberFamilies(principal.getId());
     }
 
-    @PostMapping("/hasFamily")
+    @GetMapping("/hasFamily")
     public boolean hasFamily(@AuthenticationPrincipal MemberPrincipal principal){
         return memberService.memberHasFamily(principal.getId());
     }

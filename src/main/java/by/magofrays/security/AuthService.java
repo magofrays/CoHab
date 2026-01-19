@@ -18,6 +18,7 @@ public class AuthService implements UserDetailsService {
         return memberRepository.findByUsername(username).map(member -> MemberPrincipal.builder()
                 .id(member.getId())
                 .username(member.getUsername())
+                .password(member.getPassword())
                 .superRole(member.getSuperRole())
                 .familyAccesses(member.getFamilyAccesses())
                 .build()

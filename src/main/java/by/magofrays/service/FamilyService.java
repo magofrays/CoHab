@@ -34,7 +34,7 @@ public class FamilyService {
     public List<ReadFamilyMemberDto> getFamilyMembersByMemberId(UUID memberId){
         return memberRepository
                 .findById(memberId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND))
+                .orElseThrow(() ->  new BusinessException(ErrorCode.NOT_FOUND, "Пользователь с id: "+ memberId +" не существует."))
                 .getFamilyMembers()
                 .stream().map(FamilyMember::getFamily)
                 .map(Family::getMembers)
@@ -49,7 +49,13 @@ public class FamilyService {
         var family = familyMapper.toEntity(createFamilyDto);
         var owner = memberRepository.findById(createFamilyDto.getCreatedBy()).get();
         family.addMember(owner);
+        createBaseRole(family);
         family = familyRepository.save(family);
         return familyMapper.toDto(family);
+    }
+
+    private void createBaseRole(Family family){
+
+
     }
 }

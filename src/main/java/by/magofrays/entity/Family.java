@@ -21,7 +21,7 @@ public class Family {
 
     private String familyName;
 
-    @OneToMany
+    @OneToMany(mappedBy = "family")
     @Builder.Default
     private List<FamilyMember> members = new ArrayList<>();
 

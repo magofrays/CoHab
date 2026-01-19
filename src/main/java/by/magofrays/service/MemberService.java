@@ -3,6 +3,7 @@ import by.magofrays.dto.*;
 import by.magofrays.entity.FamilyMember;
 import by.magofrays.entity.Member;
 import by.magofrays.entity.PersonalInfo;
+import by.magofrays.entity.SuperRole;
 import by.magofrays.exception.BusinessException;
 import by.magofrays.exception.ErrorCode;
 import by.magofrays.mapper.FamilyMapper;
@@ -28,6 +29,7 @@ public class MemberService{
 
     public ReadMemberDto createMember(RegistrationDto registrationDto){
         Member member = memberMapper.forCreate(registrationDto);
+        member.setSuperRole(SuperRole.BAD_USER);
         personalInfoRepository.save(member.getPersonalInfo());
         memberRepository.save(member);
         return memberMapper.toDto(member);
@@ -35,7 +37,7 @@ public class MemberService{
 
     public List<ReadFamilyDto> findMemberFamilies(UUID memberId){
         var member = memberRepository
-                .findById(memberId).orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND));
+                .findById(memberId).orElseThrow(() ->  new BusinessException(ErrorCode.NOT_FOUND, "Пользователь с id: "+ memberId +" не существует."));
         return member.getFamilyMembers().stream().map(FamilyMember::getFamily).map(familyMapper::toDto).toList();
     }
 
@@ -43,7 +45,7 @@ public class MemberService{
         return !memberRepository
                 .findById(memberID)
                 .map(Member::getFamilyMembers).map(List::isEmpty)
-                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND));
+                .orElseThrow(() ->  new BusinessException(ErrorCode.NOT_FOUND, "Пользователь с id: "+ memberID +" не существует."));
     }
 
     public Optional<ReadMemberDto> findByUsername(String username){

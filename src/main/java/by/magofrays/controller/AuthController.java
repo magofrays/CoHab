@@ -10,9 +10,11 @@ import by.magofrays.security.JwtIssuer;
 import by.magofrays.security.MemberPrincipal;
 import by.magofrays.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.parameters.P;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import java.time.Instant;
@@ -27,6 +29,7 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final MemberService memberService;
 
+    @PreAuthorize("isAnonymous()")
     @PostMapping("/login")
     public LoginResponse login(@RequestBody @Validated SmallMemberDto loginMemberDto){
         var auth = authenticationManager.authenticate(
@@ -42,13 +45,14 @@ public class AuthController {
                 .build();
     }
 
+    @PreAuthorize("isAnonymous()")
     @PostMapping("/registration")
     public LoginResponse registration(@RequestBody @Validated RegistrationDto registrationDto){
         var member = memberService.createMember(registrationDto);
         var principal = MemberPrincipal.builder()
                 .id(member.getId())
                 .username(member.getUsername())
-                .superRole(SuperRole.BAD_USER)
+                .superRole(member.getSuperRole())
                 .build();
         var token = jwtIssuer.issue(principal);
         return LoginResponse.builder().token(token).build();
@@ -57,6 +61,9 @@ public class AuthController {
     @PostMapping("/isAuthenticated")
     public void isAuthenticated(){}
 
+    @PreAuthorize("hasAnyAuthority('USER', 'GOD')")
+    @PostMapping("/isUser")
+    public void isUser(){}
 
 
 }
