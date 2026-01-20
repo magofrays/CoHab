@@ -34,11 +34,13 @@ public class MemberController {
     }
 
     @GetMapping("/families")
+    @PreAuthorize("hasAuthority('USER')")
     public List<ReadFamilyDto> getMemberFamilies(@AuthenticationPrincipal MemberPrincipal principal){
         return memberService.findMemberFamilies(principal.getId());
     }
 
     @GetMapping("/hasFamily")
+    @PreAuthorize("hasAuthority('USER')")
     public boolean hasFamily(@AuthenticationPrincipal MemberPrincipal principal){
         return memberService.memberHasFamily(principal.getId());
     }

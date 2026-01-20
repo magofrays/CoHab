@@ -17,10 +17,10 @@ public class FamilyMember {
     @Id
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     private Family family;
 
     @Builder.Default

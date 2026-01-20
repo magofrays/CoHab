@@ -4,28 +4,27 @@ import by.magofrays.dto.*;
 import by.magofrays.entity.FamilyMember;
 import by.magofrays.entity.Member;
 import by.magofrays.entity.PersonalInfo;
-import by.magofrays.entity.Role;
 import by.magofrays.security.MemberPrincipal;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 import java.util.UUID;
 
 @Component
-@Mapper(componentModel = "spring", uses = {PersonalInfoMapper.class, FamilyMapper.class})
+@Mapper(componentModel = "spring", uses = {PersonalInfoMapper.class, FamilyMapper.class, RoleMapper.class})
 public abstract class MemberMapper {
     @Autowired
     protected PasswordEncoder passwordEncoder;
-    @Autowired
-    protected PersonalInfoMapper personalInfoMapper;
 
-    @Mapping(target = "personalInfoDto", ignore = true)
+    @Mapping(target = "username", source = "member.username")
+    @Mapping(target = "personalInfoDto", source = "member.personalInfo")
+    @Mapping(target = "roleDtos", source = "roles") // MapStruct автоматически использует RoleMapper
     @Mapping(target = "familyDto", source = "family")
-    @Mapping(target = "accessList", ignore = true)
-    public abstract ReadFamilyMemberDto toDto(FamilyMember member);
+    @Mapping(target = "addedAt", source = "addedAt")
+    public abstract ReadFamilyMemberDto toDto(FamilyMember familyMember);
+
+
 
     @Mapping(target = "personalInfoDto", source = "personalInfo")
     public abstract ReadMemberDto toDto(Member member);
@@ -43,12 +42,6 @@ public abstract class MemberMapper {
                 .lastname(registrationDto.getLastname())
                 .birthDate(registrationDto.getBirthDate())
                 .build();
-    }
-
-    @AfterMapping
-    protected void convertRolesToAccesses(@MappingTarget ReadFamilyMemberDto familyMemberDto, @Context FamilyMember familyMember){
-        familyMemberDto.setAccessList(familyMember.getRoles().stream().map(Role::getAccessList).flatMap(List::stream).toList());
-        familyMemberDto.setPersonalInfoDto(personalInfoMapper.toDto(familyMember.getMember().getPersonalInfo()));
     }
 
 

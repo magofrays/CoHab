@@ -7,6 +7,8 @@ import lombok.SneakyThrows;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -36,12 +38,21 @@ public class SecurityConfiguration {
     private final JwtAuthFilter jwtAuthFilter;
     private final AuthService authService;
     private final CorsProperties corsProperties;
+    private final FamilyPermissionEvaluator familyPermissionEvaluator;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+
+    @Bean
+    public MethodSecurityExpressionHandler methodSecurityExpressionHandler() {
+        DefaultMethodSecurityExpressionHandler expressionHandler =
+                new DefaultMethodSecurityExpressionHandler();
+        expressionHandler.setPermissionEvaluator(familyPermissionEvaluator);
+        return expressionHandler;
+    }
 
     @Bean
     public CorsConfigurationSource corsConfiguration(){

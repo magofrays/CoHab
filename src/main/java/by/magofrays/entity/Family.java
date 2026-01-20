@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -28,9 +29,8 @@ public class Family {
     @ManyToOne
     private Member createdBy;
 
-    public void addMember(Member member){
-        var familyMember = FamilyMember.builder().member(member).family(this).build();
-        member.getFamilyMembers().add(familyMember);
+    public void addMember(FamilyMember familyMember){
+        familyMember.setAddedAt(LocalDateTime.now());
         members.add(familyMember);
     }
 }

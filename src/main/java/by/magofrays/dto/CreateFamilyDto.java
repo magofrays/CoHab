@@ -11,7 +11,7 @@ import java.util.UUID;
 @Data
 public class CreateFamilyDto {
     @NotBlank
-    @Unique(entityClass = Family.class, fieldName = "familyName", message = "Это имя семьи уже занято!")
+//    @Unique(entityClass = Family.class, fieldName = "familyName", message = "Это имя семьи уже занято!")
     private String familyName;
     //todo check for number of created families
     private UUID createdBy;

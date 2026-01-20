@@ -1,7 +1,5 @@
 package by.magofrays.dto;
 
-import by.magofrays.entity.Access;
-import by.magofrays.entity.Role;
 import lombok.Builder;
 import lombok.Data;
 
@@ -16,7 +14,6 @@ public class ReadFamilyMemberDto {
     String username;
     PersonalInfoDto personalInfoDto;
     ReadFamilyDto familyDto;
-    List<Role> roles;
-    List<Access> accessList;
+    List<RoleDto> roleDtos;
     private LocalDateTime addedAt;
 }

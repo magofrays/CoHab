@@ -19,6 +19,16 @@ logging:
     org.springframework.security: debug
     org.springframework.validation: DEBUG
     by.magofrays: debug
+
+user:
+  max-families: 5
+
+family:
+  admin-role-name: ADMIN
+  admin-role-value: 100
+  user-role-name: MEMBER
+  user-role-value: 10
+
 server:
   port: 8080
   address: 0.0.0.0

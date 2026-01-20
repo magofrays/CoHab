@@ -1,8 +1,5 @@
 package by.magofrays.controller;
-import by.magofrays.dto.CreateFamilyDto;
-import by.magofrays.dto.ReadFamilyDto;
-import by.magofrays.dto.ReadFamilyMemberDto;
-import by.magofrays.dto.ReadMemberDto;
+import by.magofrays.dto.*;
 import by.magofrays.security.MemberPrincipal;
 import by.magofrays.service.FamilyService;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +10,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 
 @RestController
@@ -21,12 +19,13 @@ import java.util.List;
 public class FamilyController {
     private final FamilyService familyService;
 
-    @GetMapping("{name}/members")
-    @PreAuthorize("hasAuthority('USER') && hasPermission(#name, 'family', SHOW_MEMBERS)")
-    public List<ReadFamilyMemberDto> findAllFamilyMembers(@AuthenticationPrincipal MemberPrincipal principal){
-        return familyService.getFamilyMembersByMemberId(principal.getId());
-
+    @GetMapping("{familyId}/members")
+    @PreAuthorize("hasAuthority('USER') && hasPermission(#familyId, 'family', 'SHOW_MEMBERS')")
+    public List<ReadFamilyMemberDto> getFamilyMembers(@PathVariable UUID familyId){
+        return familyService.getFamilyMembersByMemberId(familyId);
     }
+
+
 
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('USER')")
@@ -34,5 +33,11 @@ public class FamilyController {
                                       @Validated @RequestBody CreateFamilyDto createFamilyDto){
         createFamilyDto.setCreatedBy(principal.getId());
         return familyService.createFamily(createFamilyDto);
+    }
+
+    @PostMapping("{familyId}/createInvitation")
+    @PreAuthorize("hasAuthority('USER') && hasPermission(#request.familyId, 'family', 'CREATE_INVITATION')")
+    public String createInvitation(CreateInvitation request){
+        return null;
     }
 }

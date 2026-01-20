@@ -21,6 +21,14 @@ server:
   port: 8080
   address: 0.0.0.0
 
+user:
+  max-families: 5
+
+family:
+  admin-role-name: ADMIN
+  admin-role-value: 100
+  user-role-name: MEMBER
+  user-role-value: 10
 security:
   jwt:
     secret-key: iluvnastu
