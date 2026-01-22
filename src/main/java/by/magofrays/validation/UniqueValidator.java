@@ -28,7 +28,7 @@ public class UniqueValidator implements ConstraintValidator<Unique, Object> {
     @Transactional(readOnly = true)
     public boolean isValid(Object value, ConstraintValidatorContext context) {
         if (value == null) {
-            return true;
+            return false;
         }
 
         String jpql = String.format("SELECT COUNT(e) FROM %s e WHERE e.%s = :value",

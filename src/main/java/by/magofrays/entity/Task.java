@@ -20,6 +20,8 @@ public class Task {
     private Member createdBy;
     @ManyToOne
     private Member issuedTo;
+    private Boolean isDone;
+    private Boolean isChecked;
     private LocalDate createdDate;
     private LocalDate dueDate;
 }

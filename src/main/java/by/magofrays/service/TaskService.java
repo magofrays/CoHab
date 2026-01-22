@@ -11,6 +11,7 @@ import by.magofrays.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,28 +29,44 @@ public class TaskService {
     public ReadTaskDto createTask(CreateUpdateTaskDto taskDto){
         var task = taskMapper.toEntity(taskDto);
         if(taskDto.getIssuedTo() != null){
-            task.setIssuedTo(memberRepository.findById(taskDto.getIssuedTo())
-                    .map(member -> member.getFamilyMembers().stream()
-                            .filter(familyMember -> familyMember
-                                    .getFamily()
-                                    .getFamilyName()
-                                    .equals(taskDto.getFamilyName()))
-                            .findFirst()
-                            .map(familyMember -> member)
-                            .orElseThrow(() -> new BusinessException(
-                                    ErrorCode.BAD_REQUEST,
-                                    "Назначенный пользователь не состоит в этой семье."
-                            ))
-                    )
-                    .orElseThrow(() -> new BusinessException(
-                            ErrorCode.NOT_FOUND,
-                            "Пользователь с id " + taskDto.getIssuedTo() + " не найден"
-                    )));
+            task.setIssuedTo(memberRepository
+                    .findById(taskDto.getIssuedTo())
+                    .orElseThrow(() ->
+                            new BusinessException(ErrorCode.NOT_FOUND, "Пользователь с id: "+ taskDto.getIssuedTo() +" не существует.")));
+        }
+        else{
+            task.setIssuedTo(memberRepository
+                    .findById(taskDto.getCreatedBy())
+                    .orElseThrow(() ->
+                            new BusinessException(ErrorCode.NOT_FOUND, "Пользователь с id: "+ taskDto.getCreatedBy() +" не существует.")));
         }
         task.setCreatedBy(memberRepository
                 .findById(taskDto.getCreatedBy())
                 .orElseThrow(() ->
                         new BusinessException(ErrorCode.NOT_FOUND, "Пользователь с id: "+ taskDto.getCreatedBy() +" не существует.")));
+        task.setId(UUID.randomUUID());
+        task.setCreatedDate(LocalDate.now());
+        return taskMapper.toDto(taskRepository.save(task));
+    }
+
+    public ReadTaskDto updateTask(CreateUpdateTaskDto taskDto){
+        var task = taskRepository.findById(taskDto.getTaskId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "Задачи с id: " + taskDto.getTaskId() + " не существует"));
+        if(taskDto.getTaskName() != null){
+            task.setTaskName(taskDto.getTaskName());
+        }
+        if(taskDto.getDescription() != null){
+            task.setDescription(taskDto.getDescription());
+        }
+        if(taskDto.getDueDate() != null){
+            task.setDueDate(taskDto.getDueDate());
+        }
+        if(taskDto.getIssuedTo() != null){
+            task.setIssuedTo(memberRepository
+                    .findById(taskDto.getIssuedTo())
+                    .orElseThrow(() ->
+                            new BusinessException(ErrorCode.NOT_FOUND, "Пользователь с id: "+ taskDto.getCreatedBy() +" не существует.")));
+        }
         return taskMapper.toDto(taskRepository.save(task));
     }
 }

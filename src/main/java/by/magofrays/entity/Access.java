@@ -6,7 +6,10 @@ public enum Access {
     REMOVE_USER,
     CREATE_ROLE,
     GENERATE_INVITE_LINK,
+    UPDATE_TASK,
+    DELETE_TASK,
     SHOW_MEMBERS,
+    SHOW_TASKS,
     CREATE_TASK,
     ASSIGN_TASK;
 

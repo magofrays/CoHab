@@ -1,8 +1,10 @@
 package by.magofrays.exception;
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.validation.BindException;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -20,16 +22,14 @@ public class GlobalExceptionHandler{
     @ExceptionHandler(BusinessException.class)
     public ProblemDetail handle(BusinessException e){
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
-                HttpStatus.BAD_REQUEST,
+                HttpStatus.BAD_REQUEST, //todo разные коды в зависимости от e.getErrorCode()
                 e.getMessage()
         );
         problemDetail.setTitle("Business Error");
         problemDetail.setProperty("errorCode", e.getErrorCode());
         problemDetail.setProperty("timestamp", LocalDateTime.now());
-
         return problemDetail;
     }
-
 
     @ExceptionHandler(BindException.class)
     public ProblemDetail handleBindException(BindException ex) {

@@ -10,7 +10,7 @@ import java.util.UUID;
 @Value
 @Builder
 public class ReadTaskDto {
-    UUID id;
+    UUID taskId;
     String taskName;
     String description;
     UUID createdBy;

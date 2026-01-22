@@ -4,6 +4,7 @@ import by.magofrays.security.JwtDecoder;
 import by.magofrays.security.JwtToPrincipalMapper;
 import by.magofrays.security.MemberPrincipalAuthToken;
 import by.magofrays.service.MemberService;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -39,7 +40,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         var memberOptional = extractTokenFromRequest(request);
         if(memberOptional.isPresent()){
-
+            try{
             memberOptional.map(jwtDecoder::decode) // ты меня заебал уже блять
                     .map(jwtToPrincipalMapper::convert)
                     .map(MemberPrincipalAuthToken::new)
@@ -49,6 +50,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     });
             log.debug("=== After filter chain ===");
             log.debug("Current auth: {}", SecurityContextHolder.getContext().getAuthentication());
+            }catch (TokenExpiredException ignored){
+
+            }
         }
         filterChain.doFilter(request, response);
     }

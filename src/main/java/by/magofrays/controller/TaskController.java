@@ -24,8 +24,8 @@ public class TaskController {
 
     @PostMapping("/create")
     @PreAuthorize("""
-        hasAuthority('USER') && hasPermission(createTaskDto.familyName, 'family', CREATE_TASK)
-        && ((createTaskDto.issuedTo() == null) || (hasPermission(createTaskDto.familyName, 'family', ASSIGN_TASK)))
+        hasAuthority('USER') && hasPermission(#createTaskDto.familyId, 'family', 'CREATE_TASK')
+        && (#createTaskDto.issuedTo == null || hasPermission(#createTaskDto.familyId, 'family', 'ASSIGN_TASK'))
     """)
     public ReadTaskDto createTask(@AuthenticationPrincipal MemberPrincipal principal,
                            @RequestBody CreateUpdateTaskDto createTaskDto){
@@ -33,13 +33,16 @@ public class TaskController {
         return taskService.createTask(createTaskDto);
     }
 
-//    @PutMapping(
-//            """
-//                has
-//            """
-//    )
-//    public ReadTaskDto changeTask(@AuthenticationPrincipal MemberPrincipal principal,
-//                                  @RequestBody CreateUpdateTaskDto updateTaskDto) {
-//
-//    }
+    @PutMapping("/update")
+    @PreAuthorize(
+            """
+                hasAuthority('USER') && (hasPermission(#updateTaskDto.familyId, 'family', 'UPDATE_TASK')
+                || principal.id.equals(updateTaskDto.createdBy))
+                && (#updateTaskDto.issuedTo == null || hasPermission(#updateTaskDto.familyId, 'family', 'ASSIGN_TASK'))
+            """
+    )
+    public ReadTaskDto changeTask(@AuthenticationPrincipal MemberPrincipal principal,
+                                  @RequestBody CreateUpdateTaskDto updateTaskDto) {
+        return taskService.updateTask(updateTaskDto);
+    }
 }

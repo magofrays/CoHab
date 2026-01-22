@@ -9,5 +9,6 @@ import java.util.UUID;
 
 public interface FamilyMemberRepository extends JpaRepository<FamilyMember, UUID> {
     Optional<FamilyMember> findByMember_usernameAndFamily_Id(String username, UUID familyId);
+    Optional<FamilyMember> findByMember_IdAndFamily_Id(UUID username, UUID familyId);
     List<FamilyMember> findByFamily_Id(UUID familyId);
 }
