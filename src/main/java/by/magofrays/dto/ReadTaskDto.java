@@ -10,11 +10,13 @@ import java.util.UUID;
 @Value
 @Builder
 public class ReadTaskDto {
-    UUID taskId;
+    UUID id;
     String taskName;
     String description;
-    UUID createdBy;
-    UUID issuedTo;
+    SmallFamilyMemberDto createdBy;
+    SmallFamilyMemberDto issuedTo;
     LocalDate createdDate;
     LocalDate dueDate;
+    Boolean isMarked;
+    Boolean isChecked;
 }

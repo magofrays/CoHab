@@ -5,7 +5,6 @@ import by.magofrays.entity.SuperRole;
 import lombok.Builder;
 import lombok.Value;
 
-import java.util.List;
 import java.util.UUID;
 
 @Value
@@ -13,7 +12,6 @@ import java.util.UUID;
 public class ReadMemberDto {
     UUID id;
     String username;
-    PersonalInfoDto personalInfoDto;
-    List<ReadFamilyDto> familyDtos;
+    PersonalInfoDto personalInfo;
     SuperRole superRole;
 }

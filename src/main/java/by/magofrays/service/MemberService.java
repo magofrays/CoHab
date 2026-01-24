@@ -35,10 +35,10 @@ public class MemberService{
         return memberMapper.toDto(member);
     }
 
-    public List<ReadFamilyDto> findMemberFamilies(UUID memberId){
+    public List<ReadFamilyMemberDto> getFamilyMembers(UUID memberId){
         var member = memberRepository
                 .findById(memberId).orElseThrow(() ->  new BusinessException(ErrorCode.NOT_FOUND, "Пользователь с id: "+ memberId +" не существует."));
-        return member.getFamilyMembers().stream().map(FamilyMember::getFamily).map(familyMapper::toDto).toList();
+        return member.getFamilyMembers().stream().map(memberMapper::toDto).toList();
     }
 
     public boolean memberHasFamily(UUID memberID){

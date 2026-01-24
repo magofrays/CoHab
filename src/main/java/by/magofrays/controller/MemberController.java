@@ -1,9 +1,6 @@
 package by.magofrays.controller;
 
-import by.magofrays.dto.PersonalInfoDto;
-import by.magofrays.dto.ReadFamilyDto;
-import by.magofrays.dto.ReadMemberDto;
-import by.magofrays.dto.SmallMemberDto;
+import by.magofrays.dto.*;
 import by.magofrays.exception.BusinessException;
 import by.magofrays.exception.ErrorCode;
 import by.magofrays.security.MemberPrincipal;
@@ -35,8 +32,8 @@ public class MemberController {
 
     @GetMapping("/families")
     @PreAuthorize("hasAuthority('USER')")
-    public List<ReadFamilyDto> getMemberFamilies(@AuthenticationPrincipal MemberPrincipal principal){
-        return memberService.findMemberFamilies(principal.getId());
+    public List<ReadFamilyMemberDto> getFamilies(@AuthenticationPrincipal MemberPrincipal principal){
+        return memberService.getFamilyMembers(principal.getId());
     }
 
     @GetMapping("/hasFamily")

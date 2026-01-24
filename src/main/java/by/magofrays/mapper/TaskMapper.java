@@ -14,12 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {MemberMapper.class})
 public interface TaskMapper {
 
-    @Mapping(target = "createdBy", expression = "java(task.getCreatedBy().getId())")
-    @Mapping(target = "issuedTo", expression = "java(task.getIssuedTo().getId())")
-    ReadTaskDto toDto(Task task); // todo лучше отправлять таски с профилями
+    ReadTaskDto toDto(Task task);
 
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "issuedTo", ignore = true)

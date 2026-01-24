@@ -1,5 +1,7 @@
 package by.magofrays.validation;
 
+import by.magofrays.entity.Family;
+import by.magofrays.entity.FamilyMember;
 import by.magofrays.repository.FamilyMemberRepository;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -37,7 +39,12 @@ public class InFamilyValidator implements ConstraintValidator<InFamily, Object> 
         if(memberId == null){
             return true;
         }
-        return familyMemberRepository.findByMember_IdAndFamily_Id(memberId, familyId).isPresent();
+        return familyMemberRepository
+                .findById(memberId)
+                .map(FamilyMember::getFamily)
+                .map(Family::getId)
+                .map(id -> id.equals(familyId))
+                .orElse(false);
     }
 
     @SneakyThrows

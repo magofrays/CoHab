@@ -26,5 +26,14 @@ public class FamilyMember {
     @Builder.Default
     @ManyToMany
     private List<Role> roles = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "createdBy")
+    private List<Task> createdTasks = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "issuedTo")
+    private List<Task> issuedTasks = new ArrayList<>();
+
     private LocalDateTime addedAt;
 }

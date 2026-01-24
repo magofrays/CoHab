@@ -20,7 +20,6 @@ public class AuthService implements UserDetailsService {
                 .username(member.getUsername())
                 .password(member.getPassword())
                 .superRole(member.getSuperRole())
-                .familyAccesses(member.getFamilyAccesses())
                 .build()
         ).orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
     }

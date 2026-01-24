@@ -14,6 +14,5 @@ public class PersonalInfoDto {
     @NotBlank(message = "Заполните фамилию!")
     String lastname;
     @NotNull(message = "Дата рождения не должна быть пустой!")
-    @DateTimeFormat(pattern = "dd-MM-yyyy")
     LocalDate birthDate;
 }

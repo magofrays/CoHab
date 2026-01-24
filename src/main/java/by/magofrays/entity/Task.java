@@ -17,11 +17,12 @@ public class Task {
     private String taskName;
     private String description;
     @ManyToOne
-    private Member createdBy;
+    private FamilyMember createdBy;
     @ManyToOne
-    private Member issuedTo;
-    private Boolean isDone;
-    private Boolean isChecked;
+    private FamilyMember issuedTo;
     private LocalDate createdDate;
     private LocalDate dueDate;
+
+    private Boolean isMarked;
+    private Boolean isChecked;
 }

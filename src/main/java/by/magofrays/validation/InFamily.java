@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface InFamily {
-    String message() default "User with this nickname already exists";
+    String message() default "No such member in family";
     Class<?>[] groups() default { };
     Class<? extends Payload>[] payload() default { };
     String memberField();

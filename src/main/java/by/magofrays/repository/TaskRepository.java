@@ -11,4 +11,5 @@ import java.util.UUID;
 
 public interface TaskRepository extends JpaRepository<Task, UUID> {
     List<Task> getTasksByIssuedToId(UUID issuedToId);
+    List<Task> getTasksByCreatedBy_Family_Id(UUID familyId);
 }

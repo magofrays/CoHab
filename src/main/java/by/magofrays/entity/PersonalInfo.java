@@ -24,6 +24,6 @@ public class PersonalInfo {
     String lastname;
     LocalDate birthDate;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
     Member member;
 }

@@ -18,18 +18,17 @@ public abstract class MemberMapper {
     protected PasswordEncoder passwordEncoder;
 
     @Mapping(target = "username", source = "member.username")
-    @Mapping(target = "personalInfoDto", source = "member.personalInfo")
-    @Mapping(target = "roleDtos", source = "roles") // MapStruct автоматически использует RoleMapper
-    @Mapping(target = "familyDto", source = "family")
-    @Mapping(target = "addedAt", source = "addedAt")
+    @Mapping(target = "personalInfo", source = "member.personalInfo")
     public abstract ReadFamilyMemberDto toDto(FamilyMember familyMember);
 
+    @Mapping(target = "username", source = "member.username")
+    @Mapping(target = "personalInfo", source = "member.personalInfo")
+    public abstract SmallFamilyMemberDto toSmallDto(FamilyMember familyMember);
 
-
-    @Mapping(target = "personalInfoDto", source = "personalInfo")
+    @Mapping(target = "personalInfo", source = "personalInfo")
     public abstract ReadMemberDto toDto(Member member);
 
-    @Mapping(target = "personalInfoDto", ignore = true)
+    @Mapping(target = "personalInfo", ignore = true)
     public abstract ReadMemberDto memberDto(MemberPrincipal principal);
 
     @Mapping(target = "personalInfo", expression = "java(mapPersonalInfo(registrationDto))")

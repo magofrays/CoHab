@@ -31,25 +31,4 @@ public class Member {
     @OneToMany(mappedBy = "createdBy")
     @Builder.Default
     private List<Family> createdFamilies = new ArrayList<>();
-
-    @OneToMany(mappedBy = "createdBy")
-    private List<Task> createdTasks;
-
-    @OneToMany(mappedBy = "issuedTo")
-    private List<Task> issuedTasks;
-
-    public Map<UUID, List<Access>> getFamilyAccesses() {
-        Map<UUID, List<Access>> accesses = new HashMap<>();
-
-        for (FamilyMember familyMember : familyMembers) {
-            if (familyMember.getFamily() != null && familyMember.getRoles() != null) {
-                UUID familyId = familyMember.getFamily().getId();
-                List<Access> roleAccesses = familyMember.getRoles().stream().map(Role::getAccessList).flatMap(List::stream).toList();
-                if (!roleAccesses.isEmpty()) {
-                    accesses.put(familyId, roleAccesses);
-                }
-            }
-        }
-        return accesses;
-    }
 }

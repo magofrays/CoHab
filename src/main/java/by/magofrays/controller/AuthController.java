@@ -1,7 +1,6 @@
 package by.magofrays.controller;
 
 import by.magofrays.dto.LoginResponse;
-import by.magofrays.dto.ReadMemberDto;
 import by.magofrays.dto.RegistrationDto;
 import by.magofrays.dto.SmallMemberDto;
 import by.magofrays.entity.SuperRole;

@@ -1,19 +1,14 @@
 package by.magofrays.dto;
 
-import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Data
-@Builder
-public class ReadFamilyMemberDto {
-    UUID id;
+public class SmallFamilyMemberDto { // when we know what family and know roles(for example for taskLoading)
+    UUID id; // id from FamilyMember
     String username;
     PersonalInfoDto personalInfo;
-    ReadFamilyDto family;
-    List<RoleDto> roles;
     private LocalDateTime addedAt;
 }
