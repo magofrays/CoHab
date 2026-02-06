@@ -39,12 +39,7 @@ public class InFamilyValidator implements ConstraintValidator<InFamily, Object> 
         if(memberId == null){
             return true;
         }
-        return familyMemberRepository
-                .findById(memberId)
-                .map(FamilyMember::getFamily)
-                .map(Family::getId)
-                .map(id -> id.equals(familyId))
-                .orElse(false);
+        return familyMemberRepository.memberInFamily(memberId, familyId);
     }
 
     @SneakyThrows

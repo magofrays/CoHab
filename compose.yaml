@@ -9,7 +9,7 @@ services:
       - 'POSTGRES_PASSWORD=labubu'
       - 'POSTGRES_USER=magofrays'
     ports:
-      - 5432:5432
+      - "127.0.0.1:5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -23,15 +23,16 @@ services:
       - SPRING_PROFILES_ACTIVE=prod
     image: 'cohab-backend'
     ports:
-      - 8080:8080
+      - "127.0.0.1:8080:8080"
     depends_on:
       - cohab-db
+
   cohab-front:
     build:
-      context: ./frontend/cohab-app
+      context: ../CoHab-frontend/
       dockerfile: Dockerfile
       tags:
         - cohab-frontend
     image: 'cohab-frontend'
     ports:
-      - 8081:80
+      - "127.0.0.1:8081:80"

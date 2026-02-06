@@ -5,20 +5,22 @@ import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import org.hibernate.sql.Update;
 
 import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
 public class CreateUpdateTaskDto {
+    @NotNull(groups = {Update.class})
     UUID taskId;
-    @NotBlank
+    @NotBlank(message = "Название задачи должно быть не пустое!")
     String taskName;
     String description;
     UUID createdBy;
     @NotNull
     UUID familyId;
     UUID issuedTo;
-    @Future
+    @Future(message = "Дедлайн должен быть дальше текущего времени!")
     LocalDate dueDate;
 }

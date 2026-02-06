@@ -1,6 +1,7 @@
 package by.magofrays.service;
 
 import by.magofrays.dto.CreateUpdateTaskDto;
+import by.magofrays.dto.DeleteTaskDto;
 import by.magofrays.dto.MarkCheckTaskDto;
 import by.magofrays.dto.ReadTaskDto;
 import by.magofrays.exception.BusinessException;
@@ -8,13 +9,10 @@ import by.magofrays.exception.ErrorCode;
 import by.magofrays.mapper.MemberMapper;
 import by.magofrays.mapper.TaskMapper;
 import by.magofrays.repository.FamilyMemberRepository;
-import by.magofrays.repository.FamilyRepository;
-import by.magofrays.repository.MemberRepository;
 import by.magofrays.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
-import org.yaml.snakeyaml.error.Mark;
+
 
 import java.time.LocalDate;
 import java.util.List;
@@ -26,7 +24,11 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final FamilyMemberRepository familyMemberRepository;
     private final TaskMapper taskMapper;
-    private final FamilyRepository familyRepository;
+
+
+    public Boolean isCreatedBy(UUID memberId, UUID taskId){
+        return taskRepository.isCreatedBy(memberId, taskId);
+    }
 
     public List<ReadTaskDto> getTasksByIssuedToId(UUID id){
         return taskRepository.getTasksByIssuedToId(id).stream().map(taskMapper::toDto).toList();
@@ -84,42 +86,52 @@ public class TaskService {
         return taskMapper.toDto(taskRepository.save(task));
     }
 
-    public void markOrCheckTask(MarkCheckTaskDto markTaskDto){
+    public void markOrCheckTask(MarkCheckTaskDto markTaskDto, UUID memberId){
         var task = taskRepository.findById(markTaskDto.getTaskId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "Задачи с id: " + markTaskDto.getTaskId() + " не существует!"));
-        if(task.getIsMarked() && !task.getIssuedTo()
-                .getId().equals(markTaskDto.getMemberId())){
-            throw new BusinessException(ErrorCode.BAD_REQUEST,
-                    "На пользователя с id: " + markTaskDto.getMemberId() + " задача с id: " + markTaskDto.getTaskId() + " не назначена!");
+        if(markTaskDto.getTaskMarked() != null){
+            if(!task.getIssuedTo().getMember().getId().equals(memberId)){
+
+                throw new BusinessException(ErrorCode.BAD_REQUEST,
+                        "На пользователя с id: " + memberId + " задача с id: " + markTaskDto.getTaskId() + " не назначена!");
+            }
+            else{
+                if(task.getIsChecked() != null && task.getIsChecked()){
+                    throw new BusinessException(ErrorCode.BAD_REQUEST,
+                            "Задача с id: " + markTaskDto.getTaskId() + " уже проверена!");
+                }
+                task.setIsMarked(markTaskDto.getTaskMarked());
+            }
         }
         else{
-            if(task.getIsChecked()){
+            if(markTaskDto.getTaskChecked() != null && !task.getCreatedBy().getMember().getId().equals(memberId)){
                 throw new BusinessException(ErrorCode.BAD_REQUEST,
-                        "Задача с id: " + markTaskDto.getTaskId() + " уже проверена!");
+                        "Пользователь с id: " + memberId + " не создавал задачу с id: " + markTaskDto.getTaskId() + "!");
+            }else{
+                if(task.getIsMarked() != null && !task.getIsMarked()){
+                    task.setIsMarked(markTaskDto.getTaskChecked());
+                }
+                task.setIsChecked(markTaskDto.getTaskChecked());
             }
-            task.setIsMarked(markTaskDto.getTaskMarked());
-        }
-        if(task.getIsChecked() && !task.getCreatedBy()
-                .getId().equals(markTaskDto.getMemberId())){
-            throw new BusinessException(ErrorCode.BAD_REQUEST,
-                    "Пользователь с id: " + markTaskDto.getMemberId() + " не создавал задачу с id: " + markTaskDto.getTaskId() + "!");
-        }else{
-            if(!task.getIsMarked()){
-                task.setIsMarked(markTaskDto.getTaskChecked());
-            }
-            task.setIsChecked(markTaskDto.getTaskChecked());
         }
         taskRepository.save(task);
     }
 
     public List<ReadTaskDto> getFamilyTasks(UUID familyId, UUID memberId){
-        familyMemberRepository.findByMember_IdAndFamily_Id(memberId, familyId).orElseThrow(
-                () -> new BusinessException(ErrorCode.NOT_FOUND,
-                        "Пользователь с id: " + memberId + " не состоит в семье, либо семьи с id: " + familyId + "не существует!"));
+        if(!familyMemberRepository.memberInFamily(memberId, familyId)){
+                throw new BusinessException(ErrorCode.NOT_FOUND,
+                        "Пользователь с id: " + memberId + " не состоит в семье, либо семьи с id: " + familyId + "не существует!");
+        }
         return taskRepository
                 .getTasksByCreatedBy_Family_Id(familyId)
                 .stream()
                 .map(taskMapper::toDto)
                 .toList();
+    }
+
+    public void deleteTask(DeleteTaskDto taskDto){
+        var task = taskRepository.findById(taskDto.getTaskId()).orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND,
+                "Задачи с id: " + taskDto.getTaskId() + " не существует!"));
+        taskRepository.delete(task);
     }
 }

@@ -32,6 +32,7 @@ family:
   admin-role-value: 100
   user-role-name: MEMBER
   user-role-value: 10
+  max-member-num: 20
 security:
   jwt:
     secret-key: iluvnastu

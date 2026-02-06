@@ -1,12 +1,14 @@
 package by.magofrays.controller;
 
 import by.magofrays.dto.CreateUpdateTaskDto;
+import by.magofrays.dto.DeleteTaskDto;
 import by.magofrays.dto.MarkCheckTaskDto;
 import by.magofrays.dto.ReadTaskDto;
 import by.magofrays.exception.BusinessException;
 import by.magofrays.exception.ErrorCode;
 import by.magofrays.security.MemberPrincipal;
 import by.magofrays.service.TaskService;
+import by.magofrays.validation.UpdateGroup;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -42,12 +44,13 @@ public class TaskController {
     @PreAuthorize(
             """
                 hasAuthority('USER') && (hasPermission(#updateTaskDto.familyId, 'family', 'UPDATE_TASK')
-                || principal.id.equals(updateTaskDto.createdBy))
+                || taskService.isCreatedBy(#principal.id, #updateTaskDto.taskId))
                 && (#updateTaskDto.issuedTo == null || hasPermission(#updateTaskDto.familyId, 'family', 'ASSIGN_TASK'))
             """
     )
     public ReadTaskDto changeTask(@AuthenticationPrincipal MemberPrincipal principal,
-                                  @Validated @RequestBody CreateUpdateTaskDto updateTaskDto) {
+                                  @Validated({UpdateGroup.class}) @RequestBody CreateUpdateTaskDto updateTaskDto) {
+        updateTaskDto.setCreatedBy(principal.getId());
         return taskService.updateTask(updateTaskDto);
     }
 
@@ -59,18 +62,27 @@ public class TaskController {
     public void markOrCheckTask(
             @AuthenticationPrincipal MemberPrincipal principal,
             @Validated @RequestBody MarkCheckTaskDto markOrCheckTaskDto){
-        if(markOrCheckTaskDto.getMemberId() == null){
-            markOrCheckTaskDto.setMemberId(principal.getId());
-        }
         if(markOrCheckTaskDto.getTaskMarked() == null && markOrCheckTaskDto.getTaskChecked() == null){
             throw new BusinessException(ErrorCode.BAD_REQUEST, "В запросе должна быть отметка проверки либо отметка выполненности!");
         }
-        taskService.markOrCheckTask(markOrCheckTaskDto);
+        taskService.markOrCheckTask(markOrCheckTaskDto, principal.getId());
     }
 
     @GetMapping("/{familyId}")
     public List<ReadTaskDto> getFamilyTasks(@PathVariable UUID familyId,
     @AuthenticationPrincipal MemberPrincipal principal){
         return taskService.getFamilyTasks(familyId, principal.getId());
+    }
+
+    @DeleteMapping()
+    @PreAuthorize("""
+        hasAuthority('USER') &&
+        (hasPermission(#deleteTaskDto.familyId, 'family', 'DELETE_TASK') || taskService.isCreatedBy(#principal.id, #deleteTaskDto.taskId))
+    """)
+    public void deleteTask(
+            @Validated @RequestBody DeleteTaskDto deleteTaskDto,
+            @AuthenticationPrincipal MemberPrincipal principal
+    ){
+        taskService.deleteTask(deleteTaskDto);
     }
 }

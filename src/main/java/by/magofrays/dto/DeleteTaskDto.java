@@ -1,12 +1,14 @@
 package by.magofrays.dto;
+
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+
 import java.util.UUID;
 
 @Data
-public class MarkCheckTaskDto {
+public class DeleteTaskDto {
     @NotNull
     private UUID taskId;
-    private Boolean taskMarked;
-    private Boolean taskChecked;
+    @NotNull
+    private UUID familyId;
 }

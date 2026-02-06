@@ -13,4 +13,5 @@ public class FamilyProperties {
     private Integer adminRoleValue;
     private String userRoleName;
     private Integer userRoleValue;
+    private Integer maxMemberNum;
 }
