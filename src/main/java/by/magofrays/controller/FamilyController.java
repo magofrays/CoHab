@@ -34,15 +34,22 @@ public class FamilyController {
         return familyService.createFamily(createFamilyDto);
     }
 
-    @PostMapping("/createInvitation")
-    @PreAuthorize("hasAuthority('USER') && hasPermission(#request.familyId, 'family', 'CREATE_INVITATION')")
-    public Invitation createInvitation(CreateInvitation request,
+    @PostMapping("/create-invitation")
+    @PreAuthorize("hasAuthority('USER') && hasPermission(#request.familyId, 'family', 'GENERATE_INVITE_LINK')")
+    public Invitation createInvitation(@RequestBody CreateInvitation request,
                                        @AuthenticationPrincipal MemberPrincipal principal){
         request.setMemberId(principal.getId());
         return familyService.createInvitation(request);
     }
 
-    @PutMapping("/changeName")
+    @PostMapping("/use-invitation")
+    @PreAuthorize("hasAuthority('USER')")
+    public ReadFamilyMemberDto getIntoFamilyByInvitation(@RequestBody InvitationRequest invitationCode,
+                                          @AuthenticationPrincipal MemberPrincipal principal){
+        return familyService.getIntoFamilyByInvitation(invitationCode.getCode(), principal.getId());
+    }
+
+    @PutMapping("/change-name")
     @PreAuthorize("hasAuthority('User') && hasPermission()")
     public ReadFamilyDto update(CreateFamilyDto createFamilyDto){
         return null;

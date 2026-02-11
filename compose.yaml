@@ -23,7 +23,7 @@ services:
       - SPRING_PROFILES_ACTIVE=prod
     image: 'cohab-backend'
     ports:
-      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:8082:8080"
     depends_on:
       - cohab-db
 
@@ -36,3 +36,5 @@ services:
     image: 'cohab-frontend'
     ports:
       - "127.0.0.1:8081:80"
+    depends_on:
+      - cohab-back

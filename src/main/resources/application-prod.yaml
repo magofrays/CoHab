@@ -19,7 +19,9 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 logging:
   level:
+    org.springframework.security: debug
     root: INFO
+    by.magofrays: debug
 server:
   port: 8080
   address: 0.0.0.0
@@ -36,10 +38,14 @@ family:
 security:
   jwt:
     secret-key: iluvnastu
+    expires-at: 86400
   cors:
     allowed-origins:
       - "http://localhost:5173"
       - "http://cohab-front:8081"
+      - "http://magofrays.sknt.ru"
+      - "https://magofrays.sknt.ru"
+
     allowed-methods:
       - "GET"
       - "POST"

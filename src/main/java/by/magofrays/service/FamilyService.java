@@ -85,7 +85,7 @@ public class FamilyService {
         if(invitation.getExpiresAt().isBefore(LocalDateTime.now())){
             throw new BusinessException(NOT_FOUND, "Кода приглашения: " + invitationCode + " не существует, либо он прекратил свое действие!");
         }
-        if(!familyMemberRepository.memberInFamily(memberId, invitation.getFamilyId())){
+        if(familyMemberRepository.memberInFamily(memberId, invitation.getFamilyId())){
             throw new BusinessException(BAD_REQUEST, "Пользователь уже состоит в этой семье!");
         }
         var family = familyRepository.findById(invitation.getFamilyId()).orElseThrow(
