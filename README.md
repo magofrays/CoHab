@@ -1,2 +1,5 @@
-Pet-project to learn spring.
-This is gonna be site where u can have general to-do list
+# Cohab-backend
+
+## Web-site where you can create family to-do list.
+## Create accounts, invite members into your family and assign tasks for them.
+
