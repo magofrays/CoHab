@@ -20,5 +20,6 @@ public class CreateInvitation {
     @Max(15)
     private Integer numMembers;
     @Future
+    @NotNull
     private LocalDateTime expiresAt;
 }

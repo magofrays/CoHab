@@ -15,6 +15,7 @@ import by.magofrays.repository.FamilyRepository;
 import by.magofrays.repository.MemberRepository;
 import by.magofrays.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 
 import static by.magofrays.exception.ErrorCode.*;
 
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FamilyService {
@@ -47,7 +48,9 @@ public class FamilyService {
     }
 
     public Invitation createInvitation(@Validated CreateInvitation request){
+        log.debug("Member: {} trying create invitation for family: {}", request.getMemberId(), request.getFamilyId());
         if(familyInvitationMap.containsKey(request.getFamilyId())){
+            log.debug("Invitation for family: {} already exists", request.getFamilyId());
             return invitationMap.get(
                     familyInvitationMap.get(request.getFamilyId())
             );
@@ -61,6 +64,7 @@ public class FamilyService {
                 )
                 .familyId(request.getFamilyId())
                 .build();
+        log.info("Created invitation for family: {}", request.getFamilyId());
         invitationMap.put(code, invitation);
         familyInvitationMap.put(request.getFamilyId(), code);
         return invitation;
@@ -68,6 +72,7 @@ public class FamilyService {
 
     @Scheduled(fixedDelay = 2, timeUnit = TimeUnit.HOURS)
     public void cleaningInvitationMap(){
+        log.debug("Cleaning invitation map");
         invitationMap.entrySet().iterator().forEachRemaining(entry -> {
             if (entry.getValue().getExpiresAt().isBefore(LocalDateTime.now())) {
                 invitationMap.remove(entry.getKey());
@@ -78,14 +83,18 @@ public class FamilyService {
 
     @Transactional
     public ReadFamilyMemberDto getIntoFamilyByInvitation(String invitationCode, UUID memberId){
+        log.info("Member: {} using invitation code: {}", memberId, invitationCode);
         var invitation = invitationMap.get(invitationCode);
         if(invitation == null){
+            log.warn("Invitation code: {}, does not exist ", invitationCode);
             throw new BusinessException(NOT_FOUND, "Кода приглашения: " + invitationCode + " не существует, либо он прекратил свое действие!");
         }
         if(invitation.getExpiresAt().isBefore(LocalDateTime.now())){
+            log.warn("Invitation code: {} is outdated", invitationCode);
             throw new BusinessException(NOT_FOUND, "Кода приглашения: " + invitationCode + " не существует, либо он прекратил свое действие!");
         }
         if(familyMemberRepository.memberInFamily(memberId, invitation.getFamilyId())){
+            log.warn("Member: {} is already in family", memberId);
             throw new BusinessException(BAD_REQUEST, "Пользователь уже состоит в этой семье!");
         }
         var family = familyRepository.findById(invitation.getFamilyId()).orElseThrow(
@@ -101,20 +110,23 @@ public class FamilyService {
             invitationMap.put(invitationCode, invitation);
         }
         var familyMember = addMemberToFamily(family, member);
+        log.info("Member: {} added in family: {}", memberId, invitation.getFamilyId());
         return memberMapper.toDto(familyMember);
     }
 
     @Transactional
     public ReadFamilyMemberDto createFamily(CreateFamilyDto createFamilyDto){
+        log.debug("Member: {} trying create family", createFamilyDto.getCreatedBy());
         var family = familyMapper.toEntity(createFamilyDto);
         var owner = memberRepository.findById(createFamilyDto.getCreatedBy()).orElseThrow(
                 () ->  new BusinessException(ErrorCode.NOT_FOUND, "Пользователь с id: "+ createFamilyDto.getCreatedBy()+" не существует."));
         if(owner.getFamilyMembers().size() > userProperties.getMaxFamilies() && owner.getSuperRole().equals(SuperRole.USER)){
+            log.debug("Member: {} can not create family, because has max families", createFamilyDto.getCreatedBy());
             throw new BusinessException(BAD_REQUEST, "Пользователь не может создать более " + userProperties.getMaxFamilies() + " семей!");
         }
         family = familyRepository.save(family);
         var roles = createBaseRoles(family);
-
+        log.info("Member: {} created family: {}", createFamilyDto.getCreatedBy(), family.getId());
         var ownerFamilyMember = addMemberToFamily(family, owner);
         ownerFamilyMember.getRoles().add(roles.getFirst());
         return memberMapper.toDto(ownerFamilyMember);
@@ -122,6 +134,7 @@ public class FamilyService {
 
     @Transactional
     public FamilyMember addMemberToFamily(Family family, Member member){
+        log.debug("Adding user: {} to family: {}", member.getId(), family.getId());
         var familyMember = FamilyMember.builder()
                 .family(family)
                 .member(member)
@@ -136,7 +149,9 @@ public class FamilyService {
         return familyMemberRepository.save(familyMember);
     }
 
+
     private List<Role> createBaseRoles(Family family){
+        log.debug("Creating base roles for family: {}", family.getId());
         Role admin = roleRepository.save(Role.builder()
                 .id(UUID.randomUUID())
                 .family(family)

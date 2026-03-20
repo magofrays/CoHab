@@ -11,13 +11,18 @@ import by.magofrays.mapper.TaskMapper;
 import by.magofrays.repository.FamilyMemberRepository;
 import by.magofrays.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TaskService {
@@ -34,11 +39,15 @@ public class TaskService {
         return taskRepository.getTasksByIssuedToId(id).stream().map(taskMapper::toDto).toList();
     }
 
+
     public ReadTaskDto createTask(CreateUpdateTaskDto taskDto){
+        log.debug("Member: {} trying to create task", taskDto.getCreatedBy());
         var createdBy = familyMemberRepository.findByMember_IdAndFamily_Id(taskDto.getCreatedBy(), taskDto.getFamilyId())
-                .orElseThrow(() ->
-                        new BusinessException(ErrorCode.NOT_FOUND,
-                                "Пользователь с id: "+ taskDto.getCreatedBy() +" не состоит в семье: " + taskDto.getFamilyId()));
+                .orElseThrow(() ->{
+                        log.debug("Member: {} for createdBy does not exist in family: {}", taskDto.getCreatedBy(), taskDto.getFamilyId());
+                        return new BusinessException(ErrorCode.NOT_FOUND,
+                                "Пользователь с id: "+ taskDto.getCreatedBy() +" не состоит в семье: " + taskDto.getFamilyId());
+                });
 
         var task = taskMapper.toEntity(taskDto);
         if(taskDto.getIssuedTo() != null){
@@ -49,9 +58,11 @@ public class TaskService {
                     .filter(member ->
                             member.getId().equals(taskDto.getIssuedTo()))
                     .findFirst()
-                    .orElseThrow(() ->
-                            new BusinessException(ErrorCode.NOT_FOUND,
-                                    "Пользователь с id: "+ taskDto.getIssuedTo() +" не состоит в семье: " + taskDto.getFamilyId()));
+                    .orElseThrow(() -> {
+                            log.debug("Member: {} for issuedTo does not exist in family: {}", taskDto.getIssuedTo(), taskDto.getFamilyId());
+                            return new BusinessException(ErrorCode.NOT_FOUND,
+                                    "Пользователь с id: "+ taskDto.getIssuedTo() +" не состоит в семье: " + taskDto.getFamilyId());
+                    });
             task.setIssuedTo(issuedTo);
         }
         else{
@@ -59,15 +70,20 @@ public class TaskService {
         }
         task.setCreatedBy(createdBy);
         task.setId(UUID.randomUUID());
-        task.setCreatedDate(LocalDate.now());
+        task.setCreatedDate(LocalDateTime.now());
         task.setIsChecked(false);
         task.setIsMarked(false);
+        log.info("Member: {} created task", taskDto.getTaskId());
         return taskMapper.toDto(taskRepository.save(task));
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public ReadTaskDto updateTask(CreateUpdateTaskDto taskDto){
+        log.debug("Member: {} trying to update task: {}", taskDto.getCreatedBy(), taskDto.getTaskId());
         var task = taskRepository.findById(taskDto.getTaskId())
-                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "Задачи с id: " + taskDto.getTaskId() + " не существует"));
+                .orElseThrow(() -> {
+                    log.debug("Task: {} to update does not exist", taskDto.getTaskId());
+                    return new BusinessException(ErrorCode.NOT_FOUND, "Задачи с id: " + taskDto.getTaskId() + " не существует");});
         if(taskDto.getTaskName() != null){
             task.setTaskName(taskDto.getTaskName());
         }
@@ -80,15 +96,22 @@ public class TaskService {
         if(taskDto.getIssuedTo() != null){
             task.setIssuedTo(familyMemberRepository
                     .findById(taskDto.getIssuedTo())
-                    .orElseThrow(() ->
-                            new BusinessException(ErrorCode.NOT_FOUND, "Пользователь с id: "+ taskDto.getCreatedBy() +" не существует!")));
+                    .orElseThrow(() -> {
+                        log.debug("Member: {} for issuedTo does not exist", taskDto.getIssuedTo());
+                            return new BusinessException(ErrorCode.NOT_FOUND, "Пользователь с id: "+ taskDto.getCreatedBy() +" не существует!");
+                    }));
         }
+        log.info("Member: {} updating task: {}", taskDto.getCreatedBy(), taskDto.getTaskId());
         return taskMapper.toDto(taskRepository.save(task));
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void markOrCheckTask(MarkCheckTaskDto markTaskDto, UUID memberId){
         var task = taskRepository.findById(markTaskDto.getTaskId())
-                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "Задачи с id: " + markTaskDto.getTaskId() + " не существует!"));
+                .orElseThrow(() -> {
+                    log.debug("Task: {} does not exist", markTaskDto.getTaskId());
+                    return new BusinessException(ErrorCode.NOT_FOUND, "Задачи с id: " + markTaskDto.getTaskId() + " не существует!");
+                });
         if(markTaskDto.getTaskMarked() != null){
             if(!task.getIssuedTo().getMember().getId().equals(memberId)){
 
@@ -117,6 +140,7 @@ public class TaskService {
         taskRepository.save(task);
     }
 
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public List<ReadTaskDto> getFamilyTasks(UUID familyId, UUID memberId){
         if(!familyMemberRepository.memberInFamily(memberId, familyId)){
                 throw new BusinessException(ErrorCode.NOT_FOUND,

@@ -7,6 +7,7 @@ import jakarta.persistence.OneToMany;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -20,8 +21,8 @@ public class Task {
     private FamilyMember createdBy;
     @ManyToOne
     private FamilyMember issuedTo;
-    private LocalDate createdDate;
-    private LocalDate dueDate;
+    private LocalDateTime createdDate;
+    private LocalDateTime dueDate;
 
     private Boolean isMarked;
     private Boolean isChecked;

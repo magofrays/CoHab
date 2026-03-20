@@ -8,6 +8,7 @@ import lombok.Data;
 import org.hibernate.sql.Update;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
@@ -22,5 +23,5 @@ public class CreateUpdateTaskDto {
     UUID familyId;
     UUID issuedTo;
     @Future(message = "Дедлайн должен быть дальше текущего времени!")
-    LocalDate dueDate;
+    LocalDateTime dueDate;
 }

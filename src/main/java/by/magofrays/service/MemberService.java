@@ -11,13 +11,17 @@ import by.magofrays.mapper.MemberMapper;
 import by.magofrays.repository.MemberRepository;
 import by.magofrays.repository.PersonalInfoRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MemberService{
@@ -26,20 +30,22 @@ public class MemberService{
     private final PersonalInfoRepository personalInfoRepository;
     private final FamilyMapper familyMapper;
 
-
     public ReadMemberDto createMember(RegistrationDto registrationDto){
+        log.info("Creating new member");
         Member member = memberMapper.forCreate(registrationDto);
-        member.setSuperRole(SuperRole.BAD_USER);
+        member.setSuperRole(SuperRole.USER);
         personalInfoRepository.save(member.getPersonalInfo());
         memberRepository.save(member);
         return memberMapper.toDto(member);
     }
 
+    @Transactional
     public List<ReadFamilyMemberDto> getFamilyMembers(UUID memberId){
         var member = memberRepository
                 .findById(memberId).orElseThrow(() ->  new BusinessException(ErrorCode.NOT_FOUND, "Пользователь с id: "+ memberId +" не существует."));
         return member.getFamilyMembers().stream().map(memberMapper::toDto).toList();
     }
+
 
     public boolean memberHasFamily(UUID memberID){
         return !memberRepository
