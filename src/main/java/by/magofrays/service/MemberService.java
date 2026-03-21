@@ -30,12 +30,15 @@ public class MemberService{
     private final PersonalInfoRepository personalInfoRepository;
     private final FamilyMapper familyMapper;
 
+    @Transactional
     public ReadMemberDto createMember(RegistrationDto registrationDto){
         log.info("Creating new member");
-        Member member = memberMapper.forCreate(registrationDto);
+        Member member = memberMapper.toEntity(registrationDto);
+        member = memberRepository.save(member);
+        var personalInfo = memberMapper.mapPersonalInfo(registrationDto);
+        personalInfo.setMember(member);
         member.setSuperRole(SuperRole.USER);
-        personalInfoRepository.save(member.getPersonalInfo());
-        memberRepository.save(member);
+        personalInfoRepository.save(personalInfo);
         return memberMapper.toDto(member);
     }
 

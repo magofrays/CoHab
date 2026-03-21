@@ -31,11 +31,10 @@ public abstract class MemberMapper {
     @Mapping(target = "personalInfo", ignore = true)
     public abstract ReadMemberDto memberDto(MemberPrincipal principal);
 
-    @Mapping(target = "personalInfo", expression = "java(mapPersonalInfo(registrationDto))")
     @Mapping(target = "password", expression = "java(passwordEncoder.encode(registrationDto.getPassword()))")
-    public abstract Member forCreate(RegistrationDto registrationDto);
+    public abstract Member toEntity(RegistrationDto registrationDto);
 
-    protected PersonalInfo mapPersonalInfo(RegistrationDto registrationDto) {
+    public PersonalInfo mapPersonalInfo(RegistrationDto registrationDto) {
         return PersonalInfo.builder()
                 .firstname(registrationDto.getFirstname())
                 .lastname(registrationDto.getLastname())

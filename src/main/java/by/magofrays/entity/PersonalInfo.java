@@ -24,4 +24,9 @@ public class PersonalInfo {
     @OneToOne
     @JoinColumn(name = "member_id", unique = true)
     Member member;
+
+    public void setMember(Member member) {
+        this.member = member;
+        member.setPersonalInfo(this);
+    }
 }
