@@ -12,7 +12,6 @@ public class CoHabApplication {
 	public static void main(String[] args) {
 
 		SpringApplication.run(CoHabApplication.class, args);
-		log.info("Server running on: http//localhost:8080");
 	}
 
 }

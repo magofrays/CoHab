@@ -1,9 +1,6 @@
 package by.magofrays.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,6 +28,11 @@ public class Role {
     private List<Access> accessList = new ArrayList<>();
 
     @ManyToMany
+    @JoinTable(
+            name = "family_member_roles",
+            joinColumns = @JoinColumn(name = "roles_id"),
+            inverseJoinColumns = @JoinColumn(name = "family_member_id")
+    )
     @Builder.Default
     private List<FamilyMember> familyMembers = new ArrayList<>();
 }

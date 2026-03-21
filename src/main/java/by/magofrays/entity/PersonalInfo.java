@@ -1,9 +1,6 @@
 package by.magofrays.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,5 +22,6 @@ public class PersonalInfo {
     LocalDate birthDate;
 
     @OneToOne
+    @JoinColumn(name = "member_id", unique = true)
     Member member;
 }

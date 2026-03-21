@@ -17,7 +17,7 @@ public class Member {
 
     private String username;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(mappedBy="member")
     private PersonalInfo personalInfo;
 
     private String password;
