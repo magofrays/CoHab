@@ -25,11 +25,4 @@ public class PersonalInfo {
     @OneToOne
     @JoinColumn(name = "member_id", unique = true)
     Member member;
-
-    public void setMember(Member member) {
-        this.member = member;
-        if (member != null && member.getPersonalInfo() != this) {
-            member.setPersonalInfo(this);
-        }
-    }
 }
