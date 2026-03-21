@@ -88,10 +88,10 @@ create table task (
     due_date timestamptz(0) not null default current_timestamp,
     primary key (id),
     foreign key (created_by_id)
-        references member (id)
+        references family_member (id)
         on delete cascade,
     foreign key (issued_to_id)
-        references member (id)
+        references family_member (id)
         on delete cascade
 );
 

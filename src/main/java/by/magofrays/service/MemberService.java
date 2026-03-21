@@ -38,6 +38,7 @@ public class MemberService{
         PersonalInfo personalInfo = memberMapper.mapPersonalInfo(registrationDto);
         personalInfo.setMember(member);
         member = memberRepository.save(member);
+        personalInfoRepository.save(personalInfo);
         return memberMapper.toDto(member);
     }
 
