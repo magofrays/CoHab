@@ -18,7 +18,7 @@ public class Member {
 
     private String username;
 
-    @OneToOne(mappedBy="member")
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private PersonalInfo personalInfo;
 
     private String password;
