@@ -34,9 +34,4 @@ public abstract class FamilyMapper {
                 .orElseThrow( () -> new BusinessException(ErrorCode.NOT_FOUND, "Пользователь с id: "+ createFamilyDto.getCreatedBy() +" не существует.")
                 ));
     }
-
-    @AfterMapping
-    protected void generateUuids(@MappingTarget Family family) {
-        family.setId(UUID.randomUUID());
-    }
 }
