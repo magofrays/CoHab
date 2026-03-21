@@ -69,7 +69,6 @@ public class TaskService {
             task.setIssuedTo(createdBy);
         }
         task.setCreatedBy(createdBy);
-        task.setId(UUID.randomUUID());
         task.setCreatedDate(LocalDateTime.now());
         task.setIsChecked(false);
         task.setIsMarked(false);

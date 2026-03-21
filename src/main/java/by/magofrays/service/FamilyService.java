@@ -138,7 +138,6 @@ public class FamilyService {
         var familyMember = FamilyMember.builder()
                 .family(family)
                 .member(member)
-                .id(UUID.randomUUID())
                 .build();
         var role = roleRepository.findByNameAndFamily_Id(familyProperties.getUserRoleName(),
                 family.getId())
@@ -153,7 +152,6 @@ public class FamilyService {
     private List<Role> createBaseRoles(Family family){
         log.debug("Creating base roles for family: {}", family.getId());
         Role admin = roleRepository.save(Role.builder()
-                .id(UUID.randomUUID())
                 .family(family)
                 .name(familyProperties.getAdminRoleName())
                 .accessList(
@@ -163,7 +161,6 @@ public class FamilyService {
                 )
                 .value(familyProperties.getAdminRoleValue()).build());
         Role member = roleRepository.save(Role.builder()
-                .id(UUID.randomUUID())
                 .family(family)
                 .name(familyProperties.getUserRoleName())
                 .value(familyProperties.getUserRoleValue())
