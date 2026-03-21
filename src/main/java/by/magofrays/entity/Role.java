@@ -17,6 +17,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class Role {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     private String name;
     private Integer value; // to understand hierarchy

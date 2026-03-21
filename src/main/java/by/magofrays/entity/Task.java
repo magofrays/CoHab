@@ -1,9 +1,6 @@
 package by.magofrays.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -14,6 +11,7 @@ import java.util.UUID;
 @Data
 public class Task {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     private String taskName;
     private String description;

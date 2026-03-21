@@ -18,6 +18,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class Family {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     private String familyName;

@@ -13,6 +13,7 @@ import java.util.*;
 @NoArgsConstructor
 public class Member {
     @Id
+    @GeneratedValue
     private UUID id;
 
     private String username;

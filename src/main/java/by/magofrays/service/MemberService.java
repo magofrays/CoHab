@@ -31,14 +31,13 @@ public class MemberService{
     private final FamilyMapper familyMapper;
 
     @Transactional
-    public ReadMemberDto createMember(RegistrationDto registrationDto){
+    public ReadMemberDto createMember(RegistrationDto registrationDto) {
         log.info("Creating new member");
         Member member = memberMapper.toEntity(registrationDto);
-        member = memberRepository.save(member);
-        var personalInfo = memberMapper.mapPersonalInfo(registrationDto);
-        personalInfo.setMember(member);
         member.setSuperRole(SuperRole.USER);
-        personalInfoRepository.save(personalInfo);
+        PersonalInfo personalInfo = memberMapper.mapPersonalInfo(registrationDto);
+        personalInfo.setMember(member);
+        member = memberRepository.save(member);
         return memberMapper.toDto(member);
     }
 

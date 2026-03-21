@@ -16,6 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class PersonalInfo {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     UUID id;
     String firstname;
     String lastname;
@@ -27,6 +28,8 @@ public class PersonalInfo {
 
     public void setMember(Member member) {
         this.member = member;
-        member.setPersonalInfo(this);
+        if (member != null && member.getPersonalInfo() != this) {
+            member.setPersonalInfo(this);
+        }
     }
 }
