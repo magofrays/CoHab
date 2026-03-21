@@ -41,13 +41,4 @@ public abstract class MemberMapper {
                 .birthDate(registrationDto.getBirthDate())
                 .build();
     }
-
-
-    @AfterMapping
-    protected void generateUuids(@MappingTarget Member member) {
-        member.setId(UUID.randomUUID());
-        if (member.getPersonalInfo() != null) {
-            member.getPersonalInfo().setId(UUID.randomUUID());
-        }
-    }
 }
