@@ -14,11 +14,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   cohab-back:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      tags:
-        - cohab-backend
+    image: ghcr.io/magofrays/cohab:main
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - COHAB_DB=${COHAB_DB}
@@ -31,7 +27,6 @@ services:
       - COHAB_SERVER_PORT=${COHAB_SERVER_PORT}
       - LOGGING_LEVEL=${LOGGING_LEVEL}
       - SHOW_SQL=${SHOW_SQL}
-    image: 'cohab-backend'
     ports:
       - ${COHAB_SERVER_PORT}:${COHAB_SERVER_PORT}
     depends_on:
