@@ -10,9 +10,7 @@ USER root
 RUN chown -R gradle:gradle /app
 USER gradle
 
-RUN gradle clean --no-daemon --stacktrace
-RUN gradle dependencies --no-daemon --info --stacktrace
-RUN gradle build -x test --no-daemon --stacktrace
+RUN gradle build -x test
 
 FROM eclipse-temurin:21-jre-alpine
 
