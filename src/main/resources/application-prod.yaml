@@ -6,9 +6,9 @@ spring:
     name: CoHab
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://cohab-db:5432/cohab
-    username: magofrays
-    password: labubu
+    url: jdbc:postgresql://cohab-db:5432/${COHAB_DB}
+    username: ${COHAB_DB_USER}
+    password: ${COHAB_DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: validate
@@ -25,12 +25,10 @@ spring:
 
 logging:
   level:
-    org.springframework.security: debug
-    root: INFO
-    by.magofrays: debug
+    org.springframework.security: ${LOGGING_LEVEL}
+    by.magofrays: ${LOGGING_LEVEL}
 server:
-  port: 8080
-  address: 0.0.0.0
+  port: ${COHAB_SERVER_PORT}
 
 user:
   max-families: 5
@@ -43,21 +41,11 @@ family:
   max-member-num: 20
 security:
   jwt:
-    secret-key: iluvnastu
-    expires-at: 86400
+    secret-key: ${JWT_SECRET_KEY}
+    expires-at: ${JWT_EXPIRES_AT}
   cors:
-    allowed-origins:
-      - "http://localhost:5173"
-      - "http://cohab-front:8081"
-      - "http://magofrays.sknt.ru"
-      - "https://magofrays.sknt.ru"
-
-    allowed-methods:
-      - "GET"
-      - "POST"
-      - "PUT"
-      - "DELETE"
-      - "OPTIONS"
+    allowed-origins: ${ALLOWED_ORIGINS}
+    allowed-methods: ${ALLOWED_METHODS}
     allowed-headers: "*"
     allow-credentials: true
     max-age: 3600
