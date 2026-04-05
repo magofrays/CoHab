@@ -22,23 +22,24 @@ import java.util.List;
 public class MemberController {
 
     private final MemberService memberService;
+
     @GetMapping("/")
     @PreAuthorize("hasAuthority('USER')")
-    public ResponseEntity<ReadMemberDto> findByUsername(@AuthenticationPrincipal MemberPrincipal principal){
+    public ResponseEntity<ReadMemberDto> findByUsername(@AuthenticationPrincipal MemberPrincipal principal) {
         return ResponseEntity.ok(memberService.findByUsername(principal.getUsername())
                 .orElseThrow(() ->
-                        new BusinessException(ErrorCode.NOT_FOUND, "Пользователь с никнеймом: "+ principal.getUsername() +" не существует.")));
+                        new BusinessException(ErrorCode.NOT_FOUND, "Пользователь с никнеймом: " + principal.getUsername() + " не существует.")));
     }
 
     @GetMapping("/families")
     @PreAuthorize("hasAuthority('USER')")
-    public List<ReadFamilyMemberDto> getFamilies(@AuthenticationPrincipal MemberPrincipal principal){
+    public List<ReadFamilyMemberDto> getFamilies(@AuthenticationPrincipal MemberPrincipal principal) {
         return memberService.getFamilyMembers(principal.getId());
     }
 
     @GetMapping("/hasFamily")
     @PreAuthorize("hasAuthority('USER')")
-    public boolean hasFamily(@AuthenticationPrincipal MemberPrincipal principal){
+    public boolean hasFamily(@AuthenticationPrincipal MemberPrincipal principal) {
         return memberService.memberHasFamily(principal.getId());
     }
 

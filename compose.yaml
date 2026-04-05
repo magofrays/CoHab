@@ -13,6 +13,38 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  kafka1:
+    image: apache/kafka:4.0.2
+    ports:
+      - "9092:9092"
+      - "9091:9091"
+    environment:
+      KAFKA_LISTENERS: CONTROLLER://0.0.0.0:9091,PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://${KAFKA_DOMAIN_1}:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka1:9091
+
+#  kafka2:
+#    image: apache/kafka:4.0.2
+#    ports:
+#      - "9093:9093"
+#      - "9094:9094"
+#    environment:
+#      KAFKA_NODE_ID: 2
+#      KAFKA_PROCESS_ROLES: broker
+#
+#      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9093,CONTROLLER://0.0.0.0:9094
+#      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://${KAFKA_DOMAIN_2}:9093
+#
+#      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+#      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+#
+#      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka1:9091
+#      KAFKA_INTER_BROKER_LISTENER_NAMES: PLAINTEXT
+
   cohab-back:
     image: ghcr.io/magofrays/cohab:main
     environment:
@@ -27,10 +59,12 @@ services:
       - COHAB_SERVER_PORT=${COHAB_SERVER_PORT}
       - LOGGING_LEVEL=${LOGGING_LEVEL}
       - SHOW_SQL=${SHOW_SQL}
+      - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS}
     ports:
       - ${COHAB_SERVER_PORT}:${COHAB_SERVER_PORT}
     depends_on:
       - cohab-db
+      - kafka1
 
   cohab-front:
     build:

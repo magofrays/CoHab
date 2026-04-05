@@ -24,18 +24,18 @@ import java.util.UUID;
 public class TaskController {
     private final TaskService taskService;
 
-    @GetMapping()
-    public List<ReadTaskDto> getTasksByMember(@AuthenticationPrincipal MemberPrincipal principal){
+    @GetMapping
+    public List<ReadTaskDto> getTasksByMember(@AuthenticationPrincipal MemberPrincipal principal) {
         return taskService.getTasksByIssuedToId(principal.getId());
     }
 
     @PostMapping("/create")
     @PreAuthorize("""
-        hasAuthority('USER') && hasPermission(#createTaskDto.familyId, 'family', 'CREATE_TASK')
-        && (#createTaskDto.issuedTo == null || hasPermission(#createTaskDto.familyId, 'family', 'ASSIGN_TASK'))
-    """)
+                hasAuthority('USER') && hasPermission(#createTaskDto.familyId, 'family', 'CREATE_TASK')
+                && (#createTaskDto.issuedTo == null || hasPermission(#createTaskDto.familyId, 'family', 'ASSIGN_TASK'))
+            """)
     public ReadTaskDto createTask(@AuthenticationPrincipal MemberPrincipal principal,
-                           @Validated @RequestBody CreateUpdateTaskDto createTaskDto){
+                                  @Validated @RequestBody CreateUpdateTaskDto createTaskDto) {
         createTaskDto.setCreatedBy(principal.getId());
         return taskService.createTask(createTaskDto);
     }
@@ -43,26 +43,29 @@ public class TaskController {
     @PutMapping("/update")
     @PreAuthorize(
             """
-                hasAuthority('USER') && (hasPermission(#updateTaskDto.familyId, 'family', 'UPDATE_TASK')
-                || taskService.isCreatedBy(#principal.id, #updateTaskDto.taskId))
-                && (#updateTaskDto.issuedTo == null || hasPermission(#updateTaskDto.familyId, 'family', 'ASSIGN_TASK'))
-            """
+                        hasAuthority('USER') && (hasPermission(#updateTaskDto.familyId, 'family', 'UPDATE_TASK')
+                        || taskService.isCreatedBy(#principal.id, #updateTaskDto.taskId))
+                        && (#updateTaskDto.issuedTo == null || hasPermission(#updateTaskDto.familyId, 'family', 'ASSIGN_TASK'))
+                    """
     )
     public ReadTaskDto changeTask(@AuthenticationPrincipal MemberPrincipal principal,
                                   @Validated({UpdateGroup.class}) @RequestBody CreateUpdateTaskDto updateTaskDto) {
         updateTaskDto.setCreatedBy(principal.getId());
         return taskService.updateTask(updateTaskDto);
+
     }
+
 
     @PostMapping("/mark-check")
     @PreAuthorize("""
-            hasAuthority('USER')
-        """
+                hasAuthority('USER')
+            """
     )
+
     public void markOrCheckTask(
             @AuthenticationPrincipal MemberPrincipal principal,
-            @Validated @RequestBody MarkCheckTaskDto markOrCheckTaskDto){
-        if(markOrCheckTaskDto.getTaskMarked() == null && markOrCheckTaskDto.getTaskChecked() == null){
+            @Validated @RequestBody MarkCheckTaskDto markOrCheckTaskDto) {
+        if (markOrCheckTaskDto.getTaskMarked() == null && markOrCheckTaskDto.getTaskChecked() == null) {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "В запросе должна быть отметка проверки либо отметка выполненности!");
         }
         taskService.markOrCheckTask(markOrCheckTaskDto, principal.getId());
@@ -70,19 +73,19 @@ public class TaskController {
 
     @GetMapping("/{familyId}")
     public List<ReadTaskDto> getFamilyTasks(@PathVariable UUID familyId,
-    @AuthenticationPrincipal MemberPrincipal principal){
+                                            @AuthenticationPrincipal MemberPrincipal principal) {
         return taskService.getFamilyTasks(familyId, principal.getId());
     }
 
-    @DeleteMapping()
+    @DeleteMapping
     @PreAuthorize("""
-        hasAuthority('USER') &&
-        (hasPermission(#deleteTaskDto.familyId, 'family', 'DELETE_TASK') || taskService.isCreatedBy(#principal.id, #deleteTaskDto.taskId))
-    """)
+                hasAuthority('USER') &&
+                (hasPermission(#deleteTaskDto.familyId, 'family', 'DELETE_TASK') || taskService.isCreatedBy(#principal.id, #deleteTaskDto.taskId))
+            """)
     public void deleteTask(
             @Validated @RequestBody DeleteTaskDto deleteTaskDto,
             @AuthenticationPrincipal MemberPrincipal principal
-    ){
+    ) {
         taskService.deleteTask(deleteTaskDto);
     }
 }

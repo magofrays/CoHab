@@ -3,7 +3,6 @@ package by.magofrays.controller;
 import by.magofrays.dto.LoginResponse;
 import by.magofrays.dto.RegistrationDto;
 import by.magofrays.dto.SmallMemberDto;
-import by.magofrays.entity.SuperRole;
 import by.magofrays.security.JwtDecoder;
 import by.magofrays.security.JwtIssuer;
 import by.magofrays.security.MemberPrincipal;
@@ -13,9 +12,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.parameters.P;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.time.Instant;
 
 
@@ -30,7 +32,7 @@ public class AuthController {
 
     @PreAuthorize("isAnonymous()")
     @PostMapping("/login")
-    public LoginResponse login(@RequestBody @Validated SmallMemberDto loginMemberDto){
+    public LoginResponse login(@RequestBody @Validated SmallMemberDto loginMemberDto) {
         var auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginMemberDto.getUsername(), loginMemberDto.getPassword())
         );
@@ -46,7 +48,7 @@ public class AuthController {
 
     @PreAuthorize("isAnonymous()")
     @PostMapping("/registration")
-    public LoginResponse registration(@RequestBody @Validated RegistrationDto registrationDto){
+    public LoginResponse registration(@RequestBody @Validated RegistrationDto registrationDto) {
         var member = memberService.createMember(registrationDto);
         var principal = MemberPrincipal.builder()
                 .id(member.getId())
@@ -58,11 +60,13 @@ public class AuthController {
     }
 
     @PostMapping("/isAuthenticated")
-    public void isAuthenticated(){}
+    public void isAuthenticated() {
+    }
 
     @PreAuthorize("hasAnyAuthority('USER', 'GOD')")
     @PostMapping("/isUser")
-    public void isUser(){}
+    public void isUser() {
+    }
 
 
 }
