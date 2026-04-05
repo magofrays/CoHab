@@ -1,4 +1,7 @@
 spring:
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+
   threads:
     virtual:
       enabled: true
@@ -27,6 +30,7 @@ logging:
   level:
     org.springframework.security: ${LOGGING_LEVEL}
     by.magofrays: ${LOGGING_LEVEL}
+    org.apache.kafka: WARN
 server:
   port: ${COHAB_SERVER_PORT}
 
