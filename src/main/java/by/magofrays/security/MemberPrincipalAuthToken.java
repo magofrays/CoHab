@@ -1,4 +1,5 @@
 package by.magofrays.security;
+
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 
 

@@ -1,15 +1,18 @@
 package by.magofrays.mapper;
 
-import by.magofrays.dto.*;
+import by.magofrays.dto.ReadFamilyMemberDto;
+import by.magofrays.dto.ReadMemberDto;
+import by.magofrays.dto.RegistrationDto;
+import by.magofrays.dto.SmallFamilyMemberDto;
 import by.magofrays.entity.FamilyMember;
 import by.magofrays.entity.Member;
 import by.magofrays.entity.PersonalInfo;
 import by.magofrays.security.MemberPrincipal;
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import java.util.UUID;
 
 @Component
 @Mapper(componentModel = "spring", uses = {PersonalInfoMapper.class, FamilyMapper.class, RoleMapper.class})

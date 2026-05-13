@@ -1,12 +1,11 @@
 package by.magofrays.security;
 
-import by.magofrays.entity.Access;
-import by.magofrays.repository.FamilyRepository;
 import by.magofrays.service.AccessService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
@@ -23,10 +22,10 @@ public class FamilyPermissionEvaluator implements PermissionEvaluator {
 
     @Override
     public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType, Object permission) {
-        if(authentication == null || !authentication.isAuthenticated()){
+        if (authentication == null || !authentication.isAuthenticated()) {
             return false;
         }
-        if(Objects.equals(targetType, "family")) {
+        if (Objects.equals(targetType, "family")) {
             var principal = (MemberPrincipal) authentication.getPrincipal();
             var accesses = accessService.getAccessesByFamilyAndMember(UUID.fromString(targetId.toString()), principal.getUsername()); // получаем из бд
             if (accesses == null) {

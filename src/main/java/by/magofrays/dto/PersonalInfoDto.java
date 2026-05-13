@@ -3,7 +3,6 @@ package by.magofrays.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Value;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 

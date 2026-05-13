@@ -1,21 +1,19 @@
 package by.magofrays.security;
 
 
-import by.magofrays.dto.ReadMemberDto;
+import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.UUID;
-import com.auth0.jwt.JWT;
+
 @Component
 @RequiredArgsConstructor
 public class JwtIssuer {
@@ -23,7 +21,7 @@ public class JwtIssuer {
     private final JwtProperties properties;
 
     @SneakyThrows
-    public String issue(MemberPrincipal principal){
+    public String issue(MemberPrincipal principal) {
         var accesses = principal.getFamilyAccesses();
         List<String> authorities = principal.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)

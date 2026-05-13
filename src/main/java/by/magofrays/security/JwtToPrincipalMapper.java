@@ -19,7 +19,7 @@ import java.util.UUID;
 public class JwtToPrincipalMapper {
     private final ObjectMapper objectMapper;
 
-    public MemberPrincipal convert(DecodedJWT jwt){
+    public MemberPrincipal convert(DecodedJWT jwt) {
         return MemberPrincipal.builder()
                 .id(UUID.fromString(jwt.getSubject()))
                 .username(jwt.getClaim("username").asString())

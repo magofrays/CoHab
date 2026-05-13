@@ -1,7 +1,6 @@
 package by.magofrays.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Value;
 
 @Value

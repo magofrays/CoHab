@@ -26,6 +26,8 @@ spring:
     default-schema: public
     contexts: prod
 
+
+
 logging:
   level:
     org.springframework.security: ${LOGGING_LEVEL}
@@ -43,6 +45,11 @@ family:
   user-role-name: MEMBER
   user-role-value: 10
   max-member-num: 20
+
+kafka:
+  topics:
+    notification: "notification"
+
 security:
   jwt:
     secret-key: ${JWT_SECRET_KEY}

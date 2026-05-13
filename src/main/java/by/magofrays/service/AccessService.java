@@ -19,7 +19,7 @@ public class AccessService {
     private final FamilyMemberRepository memberRepository;
 
     @Transactional
-    public List<Access> getAccessesByFamilyAndMember(UUID familyId, String username){
+    public List<Access> getAccessesByFamilyAndMember(UUID familyId, String username) {
 
         var familyMember = memberRepository.findByMember_usernameAndFamily_Id(username, familyId).orElseThrow(
                 () -> new BusinessException(ErrorCode.BAD_REQUEST, "Не удалось найти пользователя " + username + " в семье " + familyId + "!")

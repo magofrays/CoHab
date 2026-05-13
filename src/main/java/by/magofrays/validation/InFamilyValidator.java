@@ -1,7 +1,5 @@
 package by.magofrays.validation;
 
-import by.magofrays.entity.Family;
-import by.magofrays.entity.FamilyMember;
 import by.magofrays.repository.FamilyMemberRepository;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -36,7 +34,7 @@ public class InFamilyValidator implements ConstraintValidator<InFamily, Object> 
         }
         UUID familyId = getFieldValue(value, familyField);
         UUID memberId = getFieldValue(value, usernameField);
-        if(memberId == null){
+        if (memberId == null) {
             return true;
         }
         return familyMemberRepository.memberInFamily(memberId, familyId);

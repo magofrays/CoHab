@@ -145,7 +145,7 @@ public class TaskService {
                             "Задача с id: " + markTaskDto.getTaskId() + " уже проверена!");
                 }
                 task.setIsMarked(markTaskDto.getTaskMarked());
-                if(task.getIsMarked()){
+                if (task.getIsMarked()) {
                     result = "выполнил задачу:";
                 } else {
                     result = "убрал отметку выполнения задачи:";
@@ -162,9 +162,9 @@ public class TaskService {
                 task.setIsChecked(markTaskDto.getTaskChecked());
             }
 
-            if(task.getIsChecked()){
+            if (task.getIsChecked()) {
                 result = "проверил задачу:";
-            } else{
+            } else {
                 result = "убрал отметку проверки задачи:";
             }
 
@@ -204,7 +204,7 @@ public class TaskService {
                 this.getClass().getName(),
                 familyMember.getFamily(),
                 familyMember.getMember().getId()
-                );
+        );
         taskRepository.delete(task);
     }
 }

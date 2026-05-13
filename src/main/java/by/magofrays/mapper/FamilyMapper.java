@@ -13,8 +13,6 @@ import org.mapstruct.MappingTarget;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.UUID;
-
 @Mapper(componentModel = "spring")
 @Component
 public abstract class FamilyMapper {
@@ -28,10 +26,10 @@ public abstract class FamilyMapper {
     public abstract Family toEntity(CreateFamilyDto createFamilyDto);
 
     @AfterMapping
-    void mapCreatedBy(@MappingTarget Family family, CreateFamilyDto createFamilyDto){
+    void mapCreatedBy(@MappingTarget Family family, CreateFamilyDto createFamilyDto) {
         family.setCreatedBy(memberRepository
                 .findById(createFamilyDto.getCreatedBy())
-                .orElseThrow( () -> new BusinessException(ErrorCode.NOT_FOUND, "Пользователь с id: "+ createFamilyDto.getCreatedBy() +" не существует.")
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "Пользователь с id: " + createFamilyDto.getCreatedBy() + " не существует.")
                 ));
     }
 }

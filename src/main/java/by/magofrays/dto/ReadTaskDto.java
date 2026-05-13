@@ -1,7 +1,6 @@
 package by.magofrays.dto;
 
 import lombok.Builder;
-import lombok.Data;
 import lombok.Value;
 
 import java.time.LocalDate;

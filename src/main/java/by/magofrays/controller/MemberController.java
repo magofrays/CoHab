@@ -1,18 +1,18 @@
 package by.magofrays.controller;
 
-import by.magofrays.dto.*;
+import by.magofrays.dto.ReadFamilyMemberDto;
+import by.magofrays.dto.ReadMemberDto;
 import by.magofrays.exception.BusinessException;
 import by.magofrays.exception.ErrorCode;
 import by.magofrays.security.MemberPrincipal;
 import by.magofrays.service.MemberService;
-import by.magofrays.validation.RegistrationGroup;
-import jakarta.validation.groups.Default;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 

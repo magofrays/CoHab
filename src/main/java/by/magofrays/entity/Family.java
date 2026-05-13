@@ -1,6 +1,11 @@
 package by.magofrays.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,7 +35,7 @@ public class Family {
     @ManyToOne
     private Member createdBy;
 
-    public void addMember(FamilyMember familyMember){
+    public void addMember(FamilyMember familyMember) {
         familyMember.setAddedAt(LocalDateTime.now());
         members.add(familyMember);
     }

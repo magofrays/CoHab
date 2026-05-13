@@ -9,5 +9,6 @@ import org.springframework.stereotype.Component;
 @Mapper(componentModel = "spring")
 public abstract class PersonalInfoMapper {
     public abstract PersonalInfoDto toDto(PersonalInfo personalInfo);
+
     public abstract PersonalInfo toEntity(PersonalInfoDto personalInfoDto);
 }

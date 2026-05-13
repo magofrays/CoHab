@@ -1,6 +1,8 @@
 package by.magofrays.service;
-import by.magofrays.dto.*;
-import by.magofrays.entity.FamilyMember;
+
+import by.magofrays.dto.ReadFamilyMemberDto;
+import by.magofrays.dto.ReadMemberDto;
+import by.magofrays.dto.RegistrationDto;
 import by.magofrays.entity.Member;
 import by.magofrays.entity.PersonalInfo;
 import by.magofrays.entity.SuperRole;
@@ -12,7 +14,6 @@ import by.magofrays.repository.MemberRepository;
 import by.magofrays.repository.PersonalInfoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +25,7 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MemberService{
+public class MemberService {
     private final MemberMapper memberMapper;
     private final MemberRepository memberRepository;
     private final PersonalInfoRepository personalInfoRepository;
@@ -43,21 +44,21 @@ public class MemberService{
     }
 
     @Transactional
-    public List<ReadFamilyMemberDto> getFamilyMembers(UUID memberId){
+    public List<ReadFamilyMemberDto> getFamilyMembers(UUID memberId) {
         var member = memberRepository
-                .findById(memberId).orElseThrow(() ->  new BusinessException(ErrorCode.NOT_FOUND, "Пользователь с id: "+ memberId +" не существует."));
+                .findById(memberId).orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "Пользователь с id: " + memberId + " не существует."));
         return member.getFamilyMembers().stream().map(memberMapper::toDto).toList();
     }
 
 
-    public boolean memberHasFamily(UUID memberID){
+    public boolean memberHasFamily(UUID memberID) {
         return !memberRepository
                 .findById(memberID)
                 .map(Member::getFamilyMembers).map(List::isEmpty)
-                .orElseThrow(() ->  new BusinessException(ErrorCode.NOT_FOUND, "Пользователь с id: "+ memberID +" не существует."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "Пользователь с id: " + memberID + " не существует."));
     }
 
-    public Optional<ReadMemberDto> findByUsername(String username){
+    public Optional<ReadMemberDto> findByUsername(String username) {
         return memberRepository.findByUsername(username).map(memberMapper::toDto);
     }
 

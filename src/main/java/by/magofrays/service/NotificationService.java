@@ -21,34 +21,34 @@ public class NotificationService {
     private final KafkaTemplate<String, Notification> notificationKafkaTemplate;
 
     @Transactional(value = SUPPORTS)
-    public void sendNotificationTask(String key, String message, String from, Task task, UUID notSend){
+    public void sendNotificationTask(String key, String message, String from, Task task, UUID notSend) {
         var creator = task.getCreatedBy().getMember().getId();
         var issuer = task.getIssuedTo().getMember().getId();
         message = "Задача " + task.getTaskName() + ":\n" + message;
-        for(var id : List.of(creator, issuer)){
-            if(!id.equals(notSend)) {
+        for (var id : List.of(creator, issuer)) {
+            if (!id.equals(notSend)) {
                 sendNotification(key, message, from, id);
             }
         }
     }
 
-    public void sendNotification(String key, String message, String from, UUID recipient){
+    public void sendNotification(String key, String message, String from, UUID recipient) {
         log.info("Sending notification to recipient: {}", recipient);
         notificationKafkaTemplate.send(key, Notification.builder()
                 .recipient(recipient)
-                        .message(message)
-                        .from(from)
+                .message(message)
+                .from(from)
                 .build());
 
     }
 
     @Transactional(value = SUPPORTS)
-    public void sendNotificationFamily(String key, String message, String from, Family family, UUID notSend){
+    public void sendNotificationFamily(String key, String message, String from, Family family, UUID notSend) {
         var members = family.getMembers();
         message = "Семья " + family.getFamilyName() + ":\n" + message;
-        for(var member : members){
+        for (var member : members) {
             var id = member.getMember().getId();
-            if(!id.equals(notSend)) {
+            if (!id.equals(notSend)) {
                 sendNotification(key, message, from, id);
             }
         }

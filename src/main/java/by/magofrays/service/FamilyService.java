@@ -128,12 +128,12 @@ public class FamilyService {
         }
         var familyMember = addMemberToFamily(family, member);
         log.info("Member: {} added in family: {}", memberId, invitation.getFamilyId());
-        notificationService.sendNotificationFamily( "invite-member",
+        notificationService.sendNotificationFamily("invite-member",
                 "%s вступил в семью по коду-приглашению".formatted(member.getUsername()),
                 getClass().getName(),
                 family,
                 member.getId()
-                );
+        );
         return memberMapper.toDto(familyMember);
     }
 
@@ -205,7 +205,7 @@ public class FamilyService {
                 getClass().getName(),
                 family,
                 null
-                );
+        );
         return List.of(admin, member);
     }
 }

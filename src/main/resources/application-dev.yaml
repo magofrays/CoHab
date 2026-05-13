@@ -47,6 +47,11 @@ family:
   user-role-value: 10
   max-member-num: 20
 
+kafka:
+  topics:
+    notification: "notification"
+
+
 server:
   port: 8080
   address: 0.0.0.0

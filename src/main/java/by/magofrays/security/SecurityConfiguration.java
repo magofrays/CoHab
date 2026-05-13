@@ -23,7 +23,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 
-
 @Configuration
 @EnableMethodSecurity
 @EnableWebSecurity
@@ -50,7 +49,7 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public CorsConfigurationSource corsConfiguration(){
+    public CorsConfigurationSource corsConfiguration() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(corsProperties.getAllowedOrigins());
         configuration.setAllowedMethods(corsProperties.getAllowedMethods());
@@ -70,7 +69,7 @@ public class SecurityConfiguration {
         security
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfiguration()))
-                .sessionManagement(session ->  session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
                         auth
                                 .requestMatchers("/error").permitAll()
@@ -84,7 +83,7 @@ public class SecurityConfiguration {
 
     @Bean
     @SneakyThrows
-    public AuthenticationManager authenticationManager(HttpSecurity security){
+    public AuthenticationManager authenticationManager(HttpSecurity security) {
         AuthenticationManagerBuilder builder = security.getSharedObject(AuthenticationManagerBuilder.class);
         builder.userDetailsService(authService)
                 .passwordEncoder(passwordEncoder());

@@ -1,6 +1,5 @@
 package by.magofrays.validation;
 
-import by.magofrays.repository.MemberRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.validation.ConstraintValidator;

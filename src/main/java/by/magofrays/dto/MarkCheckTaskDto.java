@@ -1,6 +1,8 @@
 package by.magofrays.dto;
+
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+
 import java.util.UUID;
 
 @Data
