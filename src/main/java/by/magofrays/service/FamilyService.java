@@ -141,10 +141,10 @@ public class FamilyService {
     @Transactional
     public ReadFamilyMemberDto createFamily(String familyName, UUID memberId) {
         log.debug("Member: {} trying create family: {}", memberId, familyName);
-        var family = Family.builder().familyName(familyName).build();
         var owner = memberRepository.findById(memberId).orElseThrow(
                 () -> new BusinessException(HttpStatus.NOT_FOUND, "Пользователь с id: " + memberId + " не существует."));
-        if (owner.getFamilyMembers().size() > userProperties.getMaxFamilies() && owner.getSuperRole().equals(SuperRole.USER)) {
+        var family = Family.builder().familyName(familyName).createdBy(owner).build();
+             if (owner.getFamilyMembers().size() > userProperties.getMaxFamilies() && owner.getSuperRole().equals(SuperRole.USER)) {
             log.debug("Member: {} can not create family, because has max families", memberId);
             throw new BusinessException(HttpStatus.BAD_REQUEST, "Пользователь не может создать более " + userProperties.getMaxFamilies() + " семей!");
         }

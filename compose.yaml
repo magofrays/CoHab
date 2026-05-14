@@ -86,8 +86,6 @@ services:
     image: 'cohab-frontend'
     ports:
       - 127.0.0.1:${OUTER_FRONTEND_PORT}:80
-    depends_on:
-      - cohab-back
 
 volumes:
   postgres_data:

@@ -3,6 +3,7 @@ package by.magofrays.repository;
 import by.magofrays.entity.Task;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,9 +16,10 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
 
     Optional<Task> getTaskByCreatedBy_Member_IdAndId(UUID memberId, UUID taskId);
 
-    @Query(value = """
-                SELECT EXISTS(
-                    select 1 from Task t where t.id = :taskId and t.createdBy.id = :memberId)
-            """, nativeQuery = true)
-    Boolean isCreatedBy(UUID memberId, UUID taskId);
+    @Query("""
+    SELECT COUNT(t) > 0 
+    FROM Task t 
+    WHERE t.id = :taskId AND t.createdBy.id = :memberId
+    """)
+    Boolean isCreatedBy(@Param("memberId") UUID memberId, @Param("taskId") UUID taskId);
 }

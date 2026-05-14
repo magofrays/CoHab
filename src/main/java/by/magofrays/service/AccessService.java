@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -20,13 +21,13 @@ public class AccessService {
     private final FamilyMemberRepository memberRepository;
 
     @Transactional
-    @Cacheable(value="family:accesses", key="#familyId" + ":" + "#memberId")
+    @Cacheable(value = "family:accesses", key = "#familyId + ':' + #memberId")
     public List<Access> getAccessesByFamilyAndMemberId(UUID familyId, UUID memberId) {
 
         var familyMember = memberRepository.findByMember_IdAndFamily_Id(memberId, familyId).orElseThrow(
                 () -> new BusinessException(HttpStatus.BAD_REQUEST, "Не удалось найти пользователя " + memberId + " в семье " + familyId + "!")
         );
-        return familyMember.getRoles().stream().flatMap(role -> role.getAccessList().stream()).distinct().toList();
+        return familyMember.getRoles().stream().flatMap(role -> role.getAccessList().stream()).distinct().collect(Collectors.toList());
     }
 
 }
