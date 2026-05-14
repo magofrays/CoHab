@@ -1,12 +1,12 @@
 package by.magofrays.controller;
 
-import by.magofrays.dto.ReadFamilyMemberDto;
-import by.magofrays.dto.ReadMemberDto;
+import by.magofrays.dto.response.ReadFamilyMemberDto;
+import by.magofrays.dto.response.ReadMemberDto;
 import by.magofrays.exception.BusinessException;
-import by.magofrays.exception.ErrorCode;
 import by.magofrays.security.MemberPrincipal;
 import by.magofrays.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -28,7 +28,7 @@ public class MemberController {
     public ResponseEntity<ReadMemberDto> findByUsername(@AuthenticationPrincipal MemberPrincipal principal) {
         return ResponseEntity.ok(memberService.findByUsername(principal.getUsername())
                 .orElseThrow(() ->
-                        new BusinessException(ErrorCode.NOT_FOUND, "Пользователь с никнеймом: " + principal.getUsername() + " не существует.")));
+                        new BusinessException(HttpStatus.NOT_FOUND, "Пользователь с никнеймом: " + principal.getUsername() + " не существует.")));
     }
 
     @GetMapping("/families")

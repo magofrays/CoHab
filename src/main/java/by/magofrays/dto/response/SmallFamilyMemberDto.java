@@ -1,4 +1,4 @@
-package by.magofrays.dto;
+package by.magofrays.dto.response;
 
 import lombok.Data;
 

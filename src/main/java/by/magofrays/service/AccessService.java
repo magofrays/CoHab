@@ -2,10 +2,11 @@ package by.magofrays.service;
 
 import by.magofrays.entity.Access;
 import by.magofrays.exception.BusinessException;
-import by.magofrays.exception.ErrorCode;
 import by.magofrays.repository.FamilyMemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,10 +20,11 @@ public class AccessService {
     private final FamilyMemberRepository memberRepository;
 
     @Transactional
-    public List<Access> getAccessesByFamilyAndMember(UUID familyId, String username) {
+    @Cacheable(value="family:accesses", key="#familyId" + ":" + "#memberId")
+    public List<Access> getAccessesByFamilyAndMemberId(UUID familyId, UUID memberId) {
 
-        var familyMember = memberRepository.findByMember_usernameAndFamily_Id(username, familyId).orElseThrow(
-                () -> new BusinessException(ErrorCode.BAD_REQUEST, "Не удалось найти пользователя " + username + " в семье " + familyId + "!")
+        var familyMember = memberRepository.findByMember_IdAndFamily_Id(memberId, familyId).orElseThrow(
+                () -> new BusinessException(HttpStatus.BAD_REQUEST, "Не удалось найти пользователя " + memberId + " в семье " + familyId + "!")
         );
         return familyMember.getRoles().stream().flatMap(role -> role.getAccessList().stream()).distinct().toList();
     }

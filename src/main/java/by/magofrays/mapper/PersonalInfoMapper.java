@@ -1,6 +1,6 @@
 package by.magofrays.mapper;
 
-import by.magofrays.dto.PersonalInfoDto;
+import by.magofrays.dto.response.PersonalInfoDto;
 import by.magofrays.entity.PersonalInfo;
 import org.mapstruct.Mapper;
 import org.springframework.stereotype.Component;

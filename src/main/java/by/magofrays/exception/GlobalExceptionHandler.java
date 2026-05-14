@@ -17,7 +17,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     public ProblemDetail handle(BusinessException e) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
-                HttpStatus.BAD_REQUEST, //todo разные коды в зависимости от e.getErrorCode()
+                e.getErrorCode(),
                 e.getMessage()
         );
         problemDetail.setTitle("Business Error");

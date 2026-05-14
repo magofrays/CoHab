@@ -1,13 +1,16 @@
 package by.magofrays.controller;
 
-import by.magofrays.dto.CreateFamilyDto;
-import by.magofrays.dto.CreateInvitation;
-import by.magofrays.dto.InvitationRequest;
-import by.magofrays.dto.ReadFamilyDto;
-import by.magofrays.dto.ReadFamilyMemberDto;
+import by.magofrays.dto.request.CreateInvitationRequest;
+import by.magofrays.dto.request.InvitationRequest;
+import by.magofrays.dto.request.UpdateFamilyRequest;
+import by.magofrays.dto.response.ReadFamilyDto;
+import by.magofrays.dto.response.ReadFamilyMemberDto;
+import by.magofrays.dto.response.RoleDto;
+import by.magofrays.entity.Access;
 import by.magofrays.entity.Invitation;
 import by.magofrays.security.MemberPrincipal;
 import by.magofrays.service.FamilyService;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -33,32 +36,41 @@ public class FamilyController {
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('USER')")
     public ReadFamilyMemberDto createFamily(@AuthenticationPrincipal MemberPrincipal principal,
-                                            @Validated @RequestBody CreateFamilyDto createFamilyDto) {
-        createFamilyDto.setCreatedBy(principal.getId());
-        return familyService.createFamily(createFamilyDto);
+                                            @Validated @NotBlank String createFamilyDto) {
+        UUID memberId = principal.getId();
+        return familyService.createFamily(createFamilyDto, memberId);
     }
 
     @PostMapping("/create-invitation")
     @PreAuthorize("hasAuthority('USER') && hasPermission(#request.familyId, 'family', 'GENERATE_INVITE_LINK')")
-    public Invitation createInvitation(@RequestBody CreateInvitation request,
+    public Invitation createInvitation(@RequestBody @Validated CreateInvitationRequest request,
                                        @AuthenticationPrincipal MemberPrincipal principal) {
-        request.setMemberId(principal.getId());
-        return familyService.createInvitation(request);
+        UUID memberId = principal.getId();
+        return familyService.createInvitation(request, memberId);
     }
 
     @PostMapping("/use-invitation")
     @PreAuthorize("hasAuthority('USER')")
     public ReadFamilyMemberDto getIntoFamilyByInvitation(@RequestBody InvitationRequest invitationCode,
                                                          @AuthenticationPrincipal MemberPrincipal principal) {
-        return familyService.getIntoFamilyByInvitation(invitationCode.getCode(), principal.getId());
+        return familyService.getIntoFamilyByInvitation(invitationCode.code(), principal.getId());
     }
 
 
     @PutMapping("/change-name")
-    @PreAuthorize("hasAuthority('User') && hasPermission()")
-    public ReadFamilyDto update(CreateFamilyDto createFamilyDto) {
+    @PreAuthorize("hasAuthority('USER') && hasPermission(#request.familyId, 'family', 'RENAME_FAMILY')")
+    public ReadFamilyDto update(UpdateFamilyRequest request) {
         return null;
     }
 
+    @GetMapping("/role")
+    public List<RoleDto> getFamilyRoles(){
+        return null;
+    }
 
+    @PostMapping
+    @PreAuthorize("hasAuthority('USER') && hasPermission(#request.familyId, 'family', 'CREATE_ROLE')")
+    public List<Access> createRole(){
+        return null;
+    }
 }

@@ -1,8 +1,8 @@
 package by.magofrays.controller;
 
-import by.magofrays.dto.LoginResponse;
-import by.magofrays.dto.RegistrationDto;
-import by.magofrays.dto.SmallMemberDto;
+import by.magofrays.dto.response.LoginResponse;
+import by.magofrays.dto.request.RegistrationRequest;
+import by.magofrays.dto.request.LoginRequest;
 import by.magofrays.security.JwtDecoder;
 import by.magofrays.security.JwtIssuer;
 import by.magofrays.security.MemberPrincipal;
@@ -32,9 +32,9 @@ public class AuthController {
 
     @PreAuthorize("isAnonymous()")
     @PostMapping("/login")
-    public LoginResponse login(@RequestBody @Validated SmallMemberDto loginMemberDto) {
+    public LoginResponse login(@RequestBody @Validated LoginRequest loginMemberDto) {
         var auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginMemberDto.getUsername(), loginMemberDto.getPassword())
+                new UsernamePasswordAuthenticationToken(loginMemberDto.username(), loginMemberDto.password())
         );
         SecurityContextHolder.getContext().setAuthentication(auth);
         var principal = (MemberPrincipal) auth.getPrincipal();
@@ -48,12 +48,12 @@ public class AuthController {
 
     @PreAuthorize("isAnonymous()")
     @PostMapping("/registration")
-    public LoginResponse registration(@RequestBody @Validated RegistrationDto registrationDto) {
-        var member = memberService.createMember(registrationDto);
+    public LoginResponse registration(@RequestBody @Validated RegistrationRequest registrationRequest) {
+        var member = memberService.createMember(registrationRequest);
         var principal = MemberPrincipal.builder()
-                .id(member.getId())
-                .username(member.getUsername())
-                .superRole(member.getSuperRole())
+                .id(member.id())
+                .username(member.username())
+                .superRole(member.superRole())
                 .build();
         var token = jwtIssuer.issue(principal);
         return LoginResponse.builder().token(token).build();

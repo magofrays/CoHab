@@ -1,19 +1,19 @@
 package by.magofrays.service;
 
-import by.magofrays.dto.ReadFamilyMemberDto;
-import by.magofrays.dto.ReadMemberDto;
-import by.magofrays.dto.RegistrationDto;
+import by.magofrays.dto.response.ReadFamilyMemberDto;
+import by.magofrays.dto.response.ReadMemberDto;
+import by.magofrays.dto.request.RegistrationRequest;
 import by.magofrays.entity.Member;
 import by.magofrays.entity.PersonalInfo;
 import by.magofrays.entity.SuperRole;
 import by.magofrays.exception.BusinessException;
-import by.magofrays.exception.ErrorCode;
-import by.magofrays.mapper.FamilyMapper;
 import by.magofrays.mapper.MemberMapper;
 import by.magofrays.repository.MemberRepository;
 import by.magofrays.repository.PersonalInfoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,14 +29,15 @@ public class MemberService {
     private final MemberMapper memberMapper;
     private final MemberRepository memberRepository;
     private final PersonalInfoRepository personalInfoRepository;
-    private final FamilyMapper familyMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public ReadMemberDto createMember(RegistrationDto registrationDto) {
+    public ReadMemberDto createMember(RegistrationRequest registrationRequest) {
         log.info("Creating new member");
-        Member member = memberMapper.toEntity(registrationDto);
+        Member member = memberMapper.toEntity(registrationRequest);
+        member.setPassword(passwordEncoder.encode(registrationRequest.password()));
         member.setSuperRole(SuperRole.USER);
-        PersonalInfo personalInfo = memberMapper.mapPersonalInfo(registrationDto);
+        PersonalInfo personalInfo = memberMapper.mapPersonalInfo(registrationRequest);
         personalInfo.setMember(member);
         member = memberRepository.save(member);
         personalInfoRepository.save(personalInfo);
@@ -46,7 +47,7 @@ public class MemberService {
     @Transactional
     public List<ReadFamilyMemberDto> getFamilyMembers(UUID memberId) {
         var member = memberRepository
-                .findById(memberId).orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "Пользователь с id: " + memberId + " не существует."));
+                .findById(memberId).orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Пользователь с id: " + memberId + " не существует."));
         return member.getFamilyMembers().stream().map(memberMapper::toDto).toList();
     }
 
@@ -55,7 +56,7 @@ public class MemberService {
         return !memberRepository
                 .findById(memberID)
                 .map(Member::getFamilyMembers).map(List::isEmpty)
-                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "Пользователь с id: " + memberID + " не существует."));
+                .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Пользователь с id: " + memberID + " не существует."));
     }
 
     public Optional<ReadMemberDto> findByUsername(String username) {

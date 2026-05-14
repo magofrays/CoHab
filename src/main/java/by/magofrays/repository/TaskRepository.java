@@ -15,9 +15,9 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
 
     Optional<Task> getTaskByCreatedBy_Member_IdAndId(UUID memberId, UUID taskId);
 
-    @Query("""
+    @Query(value = """
                 SELECT EXISTS(
                     select 1 from Task t where t.id = :taskId and t.createdBy.id = :memberId)
-            """)
+            """, nativeQuery = true)
     Boolean isCreatedBy(UUID memberId, UUID taskId);
 }

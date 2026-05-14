@@ -1,16 +1,17 @@
 package by.magofrays.service;
 
-import by.magofrays.dto.CreateUpdateTaskDto;
-import by.magofrays.dto.DeleteTaskDto;
-import by.magofrays.dto.MarkCheckTaskDto;
-import by.magofrays.dto.ReadTaskDto;
+import by.magofrays.dto.request.CreateUpdateTaskRequest;
+import by.magofrays.dto.request.DeleteTaskRequest;
+import by.magofrays.dto.request.MarkCheckTaskRequest;
+import by.magofrays.dto.response.ReadTaskDto;
+import by.magofrays.entity.Task;
 import by.magofrays.exception.BusinessException;
-import by.magofrays.exception.ErrorCode;
 import by.magofrays.mapper.TaskMapper;
 import by.magofrays.repository.FamilyMemberRepository;
 import by.magofrays.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,29 +33,28 @@ public class TaskService {
         return taskRepository.getTasksByIssuedToId(id).stream().map(taskMapper::toDto).toList();
     }
 
-
-    public ReadTaskDto createTask(CreateUpdateTaskDto taskDto) {
-        log.debug("Member: {} trying to create task", taskDto.getCreatedBy());
-        var createdBy = familyMemberRepository.findByMember_IdAndFamily_Id(taskDto.getCreatedBy(), taskDto.getFamilyId())
+    public ReadTaskDto createTask(CreateUpdateTaskRequest taskDto, UUID memberId) {
+        log.debug("Member: {} trying to create task", memberId);
+        var createdBy = familyMemberRepository.findByMember_IdAndFamily_Id(memberId, taskDto.familyId())
                 .orElseThrow(() -> {
-                    log.debug("Member: {} for createdBy does not exist in family: {}", taskDto.getCreatedBy(), taskDto.getFamilyId());
-                    return new BusinessException(ErrorCode.NOT_FOUND,
-                            "Пользователь с id: " + taskDto.getCreatedBy() + " не состоит в семье: " + taskDto.getFamilyId());
+                    log.debug("Member: {} for createdBy does not exist in family: {}", memberId, taskDto.familyId());
+                    return new BusinessException(HttpStatus.NOT_FOUND,
+                            "Пользователь с id: " + memberId + " не состоит в семье: " + taskDto.familyId());
                 });
 
         var task = taskMapper.toEntity(taskDto);
-        if (taskDto.getIssuedTo() != null) {
+        if (taskDto.issuedTo() != null) {
             var issuedTo = createdBy
                     .getFamily()
                     .getMembers()
                     .stream()
                     .filter(member ->
-                            member.getId().equals(taskDto.getIssuedTo()))
+                            member.getId().equals(taskDto.issuedTo()))
                     .findFirst()
                     .orElseThrow(() -> {
-                        log.debug("Member: {} for issuedTo does not exist in family: {}", taskDto.getIssuedTo(), taskDto.getFamilyId());
-                        return new BusinessException(ErrorCode.NOT_FOUND,
-                                "Пользователь с id: " + taskDto.getIssuedTo() + " не состоит в семье: " + taskDto.getFamilyId());
+                        log.debug("Member: {} for issuedTo does not exist in family: {}", taskDto.issuedTo(), taskDto.familyId());
+                        return new BusinessException(HttpStatus.NOT_FOUND,
+                                "Пользователь с id: " + taskDto.issuedTo() + " не состоит в семье: " + taskDto.familyId());
                     });
             task.setIssuedTo(issuedTo);
         } else {
@@ -78,41 +78,47 @@ public class TaskService {
         return taskMapper.toDto(task);
     }
 
-    @Transactional(isolation = Isolation.READ_COMMITTED)
-    public ReadTaskDto updateTask(CreateUpdateTaskDto taskDto) {
-        log.debug("Member: {} trying to update task: {}", taskDto.getCreatedBy(), taskDto.getTaskId());
-        var task = taskRepository.findById(taskDto.getTaskId())
+    @Transactional
+    private Task getTask(UUID taskId){
+        return taskRepository.findById(taskId)
                 .orElseThrow(() -> {
-                    log.debug("Task: {} to update does not exist", taskDto.getTaskId());
-                    return new BusinessException(ErrorCode.NOT_FOUND, "Задачи с id: " + taskDto.getTaskId() + " не существует");
+                    log.debug("Task: {} to update does not exist", taskId);
+                    return new BusinessException(HttpStatus.NOT_FOUND, "Задачи с id: " + taskId + " не существует");
                 });
-        if (taskDto.getTaskName() != null) {
-            task.setTaskName(taskDto.getTaskName());
+    }
+
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public ReadTaskDto updateTask(CreateUpdateTaskRequest taskDto, UUID memberId) {
+        log.debug("Member: {} trying to update task: {}", memberId, taskDto.taskId());
+        var task = getTask(taskDto.taskId());
+        if (taskDto.taskName() != null) {
+            task.setTaskName(taskDto.taskName());
         }
-        if (taskDto.getDescription() != null) {
-            task.setDescription(taskDto.getDescription());
+        if (taskDto.description() != null) {
+            task.setDescription(taskDto.description());
         }
-        if (taskDto.getDueDate() != null) {
-            task.setDueDate(taskDto.getDueDate());
+        if (taskDto.dueDate() != null) {
+            task.setDueDate(taskDto.dueDate());
         }
-        if (taskDto.getIssuedTo() != null) {
+        if (taskDto.issuedTo() != null) {
             task.setIssuedTo(familyMemberRepository
-                    .findById(taskDto.getIssuedTo())
+                    .findById(taskDto.issuedTo())
                     .orElseThrow(() -> {
-                        log.debug("Member: {} for issuedTo does not exist", taskDto.getIssuedTo());
-                        return new BusinessException(ErrorCode.NOT_FOUND, "Пользователь с id: " + taskDto.getCreatedBy() + " не существует!");
+                        log.debug("Member: {} for issuedTo does not exist", taskDto.issuedTo());
+                        return new BusinessException(HttpStatus.NOT_FOUND, "Пользователь с id: " + taskDto.issuedTo() + " не существует!");
                     }));
         }
-        log.info("Member: {} updating task: {}", taskDto.getCreatedBy(), taskDto.getTaskId());
+        log.info("Member: {} updating task: {}", memberId, taskDto.taskId());
         task = taskRepository.save(task);
-        var familyMember = familyMemberRepository.findById(taskDto.getCreatedBy()).get();
+        var familyMember = familyMemberRepository.findByMember_IdAndFamily_Id(memberId, taskDto.familyId())
+                .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Пользователь с id: " + memberId + " не состоит в семье " + taskDto.familyId()));
         notificationService.sendNotificationFamily("update-task",
                 "%s обновил задачу".formatted(familyMember.getMember().getUsername()),
                 this.getClass().getName(),
                 familyMember.getFamily(),
                 familyMember.getMember().getId()
         );
-        if (taskDto.getIssuedTo() != null) {
+        if (taskDto.issuedTo() != null) {
             notificationService.sendNotificationTask("assign-task",
                     "%s назначил на %s задачу %s"
                             .formatted(familyMember.getMember().getUsername(),
@@ -127,24 +133,20 @@ public class TaskService {
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public void markOrCheckTask(MarkCheckTaskDto markTaskDto, UUID memberId) {
-        var task = taskRepository.findById(markTaskDto.getTaskId())
-                .orElseThrow(() -> {
-                    log.debug("Task: {} does not exist", markTaskDto.getTaskId());
-                    return new BusinessException(ErrorCode.NOT_FOUND, "Задачи с id: " + markTaskDto.getTaskId() + " не существует!");
-                });
+    public void markOrCheckTask(MarkCheckTaskRequest markTaskDto, UUID memberId) {
+        var task = getTask(markTaskDto.taskId());
         String result = "";
-        if (markTaskDto.getTaskMarked() != null) {
+        if (markTaskDto.taskMarked() != null) {
             if (!task.getIssuedTo().getMember().getId().equals(memberId)) {
 
-                throw new BusinessException(ErrorCode.BAD_REQUEST,
-                        "На пользователя с id: " + memberId + " задача с id: " + markTaskDto.getTaskId() + " не назначена!");
+                throw new BusinessException(HttpStatus.BAD_REQUEST,
+                        "На пользователя с id: " + memberId + " задача с id: " + markTaskDto.taskId() + " не назначена!");
             } else {
                 if (task.getIsChecked() != null && task.getIsChecked()) {
-                    throw new BusinessException(ErrorCode.BAD_REQUEST,
-                            "Задача с id: " + markTaskDto.getTaskId() + " уже проверена!");
+                    throw new BusinessException(HttpStatus.BAD_REQUEST,
+                            "Задача с id: " + markTaskDto.taskId() + " уже проверена!");
                 }
-                task.setIsMarked(markTaskDto.getTaskMarked());
+                task.setIsMarked(markTaskDto.taskMarked());
                 if (task.getIsMarked()) {
                     result = "выполнил задачу:";
                 } else {
@@ -152,14 +154,14 @@ public class TaskService {
                 }
             }
         } else {
-            if (markTaskDto.getTaskChecked() != null && !task.getCreatedBy().getMember().getId().equals(memberId)) {
-                throw new BusinessException(ErrorCode.BAD_REQUEST,
-                        "Пользователь с id: " + memberId + " не создавал задачу с id: " + markTaskDto.getTaskId() + "!");
+            if (markTaskDto.taskChecked() != null && !task.getCreatedBy().getMember().getId().equals(memberId)) {
+                throw new BusinessException(HttpStatus.BAD_REQUEST,
+                        "Пользователь с id: " + memberId + " не создавал задачу с id: " + markTaskDto.taskId() + "!");
             } else {
                 if (task.getIsMarked() != null && !task.getIsMarked()) {
-                    task.setIsMarked(markTaskDto.getTaskChecked());
+                    task.setIsMarked(markTaskDto.taskChecked());
                 }
-                task.setIsChecked(markTaskDto.getTaskChecked());
+                task.setIsChecked(markTaskDto.taskChecked());
             }
 
             if (task.getIsChecked()) {
@@ -184,7 +186,7 @@ public class TaskService {
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public List<ReadTaskDto> getFamilyTasks(UUID familyId, UUID memberId) {
         if (!familyMemberRepository.memberInFamily(memberId, familyId)) {
-            throw new BusinessException(ErrorCode.NOT_FOUND,
+            throw new BusinessException(HttpStatus.NOT_FOUND,
                     "Пользователь с id: " + memberId + " не состоит в семье, либо семьи с id: " + familyId + "не существует!");
         }
         return taskRepository
@@ -194,10 +196,13 @@ public class TaskService {
                 .toList();
     }
 
-    public void deleteTask(DeleteTaskDto taskDto) {
-        var task = taskRepository.findById(taskDto.getTaskId()).orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND,
-                "Задачи с id: " + taskDto.getTaskId() + " не существует!"));
-        var familyMember = familyMemberRepository.findById(taskDto.getTaskId()).get();
+    public void deleteTask(DeleteTaskRequest taskDto, UUID memberId) {
+        var task = taskRepository.findById(taskDto.taskId()).orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND,
+                "Задачи с id: " + taskDto.taskId() + " не существует!"));
+        var familyMember = familyMemberRepository.findByMember_IdAndFamily_Id(memberId, taskDto.familyId())
+                .orElseThrow(
+                        () -> new BusinessException(HttpStatus.NOT_FOUND,
+                                "Пользователь с id: " + memberId + " не состоит в семье, либо семьи с id: " + taskDto.familyId() + "не существует!"));
         notificationService.sendNotificationFamily("delete-task",
                 "%s удалил задачу %s"
                         .formatted(familyMember.getMember().getUsername(), task.getTaskName()),

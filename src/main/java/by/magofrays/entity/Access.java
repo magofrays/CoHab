@@ -1,17 +1,25 @@
 package by.magofrays.entity;
 
 public enum Access {
-    ADD_USER,
+    // admin
+    ADD_MEMBER,
+    REMOVE_MEMBER,
     RENAME_FAMILY,
-    REMOVE_USER,
-    CREATE_ROLE,
+    MANAGE_ROLE,
+    MANAGE_MEMBER_ROLES,
     GENERATE_INVITE_LINK,
+    // constraints
+    SHOW_MEMBERS,
+    SHOW_CHAT,
+    // tasks
     UPDATE_TASK,
     DELETE_TASK,
-    SHOW_MEMBERS,
     SHOW_TASKS,
     CREATE_TASK,
-    ASSIGN_TASK;
+    ASSIGN_TASK,
+    // messages
+    DELETE_MESSAGE,
+    REACT_MESSAGE;
 
     public String getAuthority() {
         return this.name();

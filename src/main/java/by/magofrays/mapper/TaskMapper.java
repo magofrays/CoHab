@@ -1,7 +1,7 @@
 package by.magofrays.mapper;
 
-import by.magofrays.dto.CreateUpdateTaskDto;
-import by.magofrays.dto.ReadTaskDto;
+import by.magofrays.dto.request.CreateUpdateTaskRequest;
+import by.magofrays.dto.response.ReadTaskDto;
 import by.magofrays.entity.Task;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -14,6 +14,6 @@ public interface TaskMapper {
 
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "issuedTo", ignore = true)
-    Task toEntity(CreateUpdateTaskDto task);
+    Task toEntity(CreateUpdateTaskRequest task);
 
 }

@@ -27,7 +27,7 @@ public class FamilyPermissionEvaluator implements PermissionEvaluator {
         }
         if (Objects.equals(targetType, "family")) {
             var principal = (MemberPrincipal) authentication.getPrincipal();
-            var accesses = accessService.getAccessesByFamilyAndMember(UUID.fromString(targetId.toString()), principal.getUsername()); // получаем из бд
+            var accesses = accessService.getAccessesByFamilyAndMemberId(UUID.fromString(targetId.toString()), principal.getId()); // получаем из бд
             if (accesses == null) {
                 return false;
             }

@@ -1,6 +1,6 @@
 package by.magofrays.configuration.kafka;
 
-import by.magofrays.dto.Notification;
+import by.magofrays.dto.response.Notification;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;

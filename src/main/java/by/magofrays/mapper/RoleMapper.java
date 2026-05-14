@@ -1,6 +1,6 @@
 package by.magofrays.mapper;
 
-import by.magofrays.dto.RoleDto;
+import by.magofrays.dto.response.RoleDto;
 import by.magofrays.entity.Role;
 import org.mapstruct.Mapper;
 

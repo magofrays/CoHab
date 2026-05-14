@@ -2,6 +2,11 @@ spring:
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
 
+  redis:
+    host: localhost
+    port: 6379
+    timeout: 60000
+
   threads:
     virtual:
       enabled: true
@@ -51,6 +56,9 @@ kafka:
   topics:
     notification: "notification"
 
+redis:
+  cache:
+    ttl: ${JWT_EXPIRES_AT}
 
 server:
   port: 8080

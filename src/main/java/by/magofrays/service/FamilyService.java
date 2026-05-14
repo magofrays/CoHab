@@ -2,13 +2,11 @@ package by.magofrays.service;
 
 import by.magofrays.configuration.FamilyProperties;
 import by.magofrays.configuration.UserProperties;
-import by.magofrays.dto.CreateFamilyDto;
-import by.magofrays.dto.CreateInvitation;
-import by.magofrays.dto.ReadFamilyMemberDto;
+import by.magofrays.dto.request.CreateInvitationRequest;
+import by.magofrays.dto.response.ReadFamilyMemberDto;
+import by.magofrays.dto.response.RoleDto;
 import by.magofrays.entity.*;
 import by.magofrays.exception.BusinessException;
-import by.magofrays.exception.ErrorCode;
-import by.magofrays.mapper.FamilyMapper;
 import by.magofrays.mapper.MemberMapper;
 import by.magofrays.repository.FamilyMemberRepository;
 import by.magofrays.repository.FamilyRepository;
@@ -17,19 +15,16 @@ import by.magofrays.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-
-import static by.magofrays.exception.ErrorCode.BAD_REQUEST;
-import static by.magofrays.exception.ErrorCode.NOT_FOUND;
 
 @Slf4j
 @Service
@@ -39,7 +34,6 @@ public class FamilyService {
     private final MemberMapper memberMapper;
     private final UserProperties userProperties;
     private final FamilyProperties familyProperties;
-    private final FamilyMapper familyMapper;
     private final MemberRepository memberRepository;
     private final RoleRepository roleRepository;
     private final FamilyMemberRepository familyMemberRepository;
@@ -51,27 +45,30 @@ public class FamilyService {
         return familyMemberRepository.findByFamily_Id(familyId).stream().map(memberMapper::toDto).toList();
     }
 
-    public Invitation createInvitation(@Validated CreateInvitation request) {
-        log.debug("Member: {} trying create invitation for family: {}", request.getMemberId(), request.getFamilyId());
-        if (familyInvitationMap.containsKey(request.getFamilyId())) {
-            log.debug("Invitation for family: {} already exists", request.getFamilyId());
+    public Invitation createInvitation(CreateInvitationRequest request, UUID memberId) {
+        log.debug("Member: {} trying create invitation for family: {}", memberId, request.familyId());
+        if (familyInvitationMap.containsKey(request.familyId())) {
+            log.debug("Invitation for family: {} already exists", request.familyId());
             return invitationMap.get(
-                    familyInvitationMap.get(request.getFamilyId())
+                    familyInvitationMap.get(request.familyId())
             );
         }
         String code = RandomStringUtils.secure().nextAlphanumeric(8).toUpperCase();
         var invitation = Invitation.builder()
                 .invitationCode(code)
-                .numMembers(request.getNumMembers())
+                .numMembers(request.numMembers())
                 .expiresAt(
-                        request.getExpiresAt()
+                        request.expiresAt()
                 )
-                .familyId(request.getFamilyId())
+                .familyId(request.familyId())
                 .build();
         invitationMap.put(code, invitation);
-        familyInvitationMap.put(request.getFamilyId(), code);
-        log.info("Created invitation for family: {}", request.getFamilyId());
-        var familyMember = familyMemberRepository.findById(request.getMemberId()).get();
+        familyInvitationMap.put(request.familyId(), code);
+        log.info("Created invitation for family: {}", request.familyId());
+        var familyMember = familyMemberRepository.findByMember_IdAndFamily_Id(memberId, request.familyId())
+                .orElseThrow(() ->
+                        new BusinessException(HttpStatus.NOT_FOUND,
+                                "Пользователь с id: " + memberId + " не состоит в семье: " + request.familyId()));
         notificationService.sendNotificationFamily("create-invitation",
                 "%s создал код-приглашение".formatted(familyMember.getMember().getUsername()),
                 this.getClass().getName(),
@@ -88,12 +85,16 @@ public class FamilyService {
             if (entry.getValue().getExpiresAt().isBefore(LocalDateTime.now())) {
                 invitationMap.remove(entry.getKey());
                 familyInvitationMap.remove(entry.getValue().getFamilyId());
-                var family = familyRepository.findById(entry.getValue().getFamilyId()).get();
-                notificationService.sendNotificationFamily("delete-invitation",
-                        "Код приглашение в семью был удален",
-                        this.getClass().getName(),
-                        family,
-                        null);
+                var family = familyRepository.findById(entry.getValue().getFamilyId());
+                if(family.isPresent()){
+                    notificationService.sendNotificationFamily("delete-invitation",
+                            "Код приглашение в семью был удален",
+                            this.getClass().getName(),
+                            family.get(),
+                            null);
+                } else {
+                    log.error("Invitation map contained invitation for family {} which is not exists", entry.getValue().getFamilyId());
+                }
             }
         });
     }
@@ -104,21 +105,21 @@ public class FamilyService {
         var invitation = invitationMap.get(invitationCode);
         if (invitation == null) {
             log.warn("Invitation code: {}, does not exist ", invitationCode);
-            throw new BusinessException(NOT_FOUND, "Кода приглашения: " + invitationCode + " не существует, либо он прекратил свое действие!");
+            throw new BusinessException(HttpStatus.NOT_FOUND, "Кода приглашения: " + invitationCode + " не существует, либо он прекратил свое действие!");
         }
         if (invitation.getExpiresAt().isBefore(LocalDateTime.now())) {
             log.warn("Invitation code: {} is outdated", invitationCode);
-            throw new BusinessException(NOT_FOUND, "Кода приглашения: " + invitationCode + " не существует, либо он прекратил свое действие!");
+            throw new BusinessException(HttpStatus.NOT_FOUND, "Кода приглашения: " + invitationCode + " не существует, либо он прекратил свое действие!");
         }
         if (familyMemberRepository.memberInFamily(memberId, invitation.getFamilyId())) {
             log.warn("Member: {} is already in family", memberId);
-            throw new BusinessException(BAD_REQUEST, "Пользователь уже состоит в этой семье!");
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "Пользователь уже состоит в этой семье!");
         }
         var family = familyRepository.findById(invitation.getFamilyId()).orElseThrow(
-                () -> new BusinessException(NOT_FOUND, "Такой семьи не существует!")
+                () -> new BusinessException(HttpStatus.NOT_FOUND, "Такой семьи не существует!")
         );
         var member = memberRepository.findById(memberId).orElseThrow(
-                () -> new BusinessException(NOT_FOUND, "Такого пользователя не существует!"));
+                () -> new BusinessException(HttpStatus.NOT_FOUND, "Такого пользователя не существует!"));
         if (invitation.getNumMembers() == 1) {
             invitationMap.remove(invitationCode);
             familyInvitationMap.remove(invitation.getFamilyId());
@@ -138,18 +139,18 @@ public class FamilyService {
     }
 
     @Transactional
-    public ReadFamilyMemberDto createFamily(CreateFamilyDto createFamilyDto) {
-        log.debug("Member: {} trying create family", createFamilyDto.getCreatedBy());
-        var family = familyMapper.toEntity(createFamilyDto);
-        var owner = memberRepository.findById(createFamilyDto.getCreatedBy()).orElseThrow(
-                () -> new BusinessException(ErrorCode.NOT_FOUND, "Пользователь с id: " + createFamilyDto.getCreatedBy() + " не существует."));
+    public ReadFamilyMemberDto createFamily(String familyName, UUID memberId) {
+        log.debug("Member: {} trying create family: {}", memberId, familyName);
+        var family = Family.builder().familyName(familyName).build();
+        var owner = memberRepository.findById(memberId).orElseThrow(
+                () -> new BusinessException(HttpStatus.NOT_FOUND, "Пользователь с id: " + memberId + " не существует."));
         if (owner.getFamilyMembers().size() > userProperties.getMaxFamilies() && owner.getSuperRole().equals(SuperRole.USER)) {
-            log.debug("Member: {} can not create family, because has max families", createFamilyDto.getCreatedBy());
-            throw new BusinessException(BAD_REQUEST, "Пользователь не может создать более " + userProperties.getMaxFamilies() + " семей!");
+            log.debug("Member: {} can not create family, because has max families", memberId);
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "Пользователь не может создать более " + userProperties.getMaxFamilies() + " семей!");
         }
         family = familyRepository.save(family);
         var roles = createBaseRoles(family);
-        log.info("Member: {} created family: {}", createFamilyDto.getCreatedBy(), family.getId());
+        log.info("Member: {} created family: {}", memberId, family.getId());
         var ownerFamilyMember = addMemberToFamily(family, owner);
         ownerFamilyMember.getRoles().add(roles.getFirst());
         notificationService.sendNotificationFamily("create-family",
@@ -169,7 +170,7 @@ public class FamilyService {
                 .build();
         var role = roleRepository.findByNameAndFamily_Id(familyProperties.getUserRoleName(),
                         family.getId())
-                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "Отсутствует основная роль: " + familyProperties.getUserRoleName()));
+                .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Отсутствует основная роль: " + familyProperties.getUserRoleName()));
         familyMember.getRoles().add(role);
         member.getFamilyMembers().add(familyMember);
         family.addMember(familyMember);
@@ -207,5 +208,9 @@ public class FamilyService {
                 null
         );
         return List.of(admin, member);
+    }
+
+    public List<Access> createRole(RoleDto role){
+        return null;
     }
 }

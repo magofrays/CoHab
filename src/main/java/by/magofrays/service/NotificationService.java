@@ -1,6 +1,6 @@
 package by.magofrays.service;
 
-import by.magofrays.dto.Notification;
+import by.magofrays.dto.response.Notification;
 import by.magofrays.entity.Family;
 import by.magofrays.entity.Task;
 import jakarta.transaction.Transactional;
