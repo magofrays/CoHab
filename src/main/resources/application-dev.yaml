@@ -2,21 +2,19 @@ spring:
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
 
-  redis:
-    host: localhost
-    port: 6379
-    timeout: 60000
-
   threads:
     virtual:
       enabled: true
+
   application:
     name: CoHab
+
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/${COHAB_DB}
     username: ${COHAB_DB_USER}
     password: ${COHAB_DB_PASSWORD}
+
   jpa:
     hibernate:
       ddl-auto: validate
@@ -25,16 +23,22 @@ spring:
       hibernate:
         format_sql: ${SHOW_SQL}
         dialect: org.hibernate.dialect.PostgreSQLDialect
-  aop:
-    auto: true
-    mvc:
-      proxy-target-class: true
 
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.yaml
     default-schema: public
     contexts: dev
+
+  data:
+    redis:
+      timeout: 60000
+      port: 6379
+      host: localhost
+
+server:
+  port: ${COHAB_SERVER_PORT}
+  address: 0.0.0.0
 
 logging:
   level:
@@ -60,9 +64,6 @@ redis:
   cache:
     ttl: ${JWT_EXPIRES_AT}
 
-server:
-  port: 8080
-  address: 0.0.0.0
 security:
   jwt:
     secret-key: ${JWT_SECRET_KEY}
@@ -70,7 +71,6 @@ security:
   cors:
     allowed-origins: ${ALLOWED_ORIGINS}
     allowed-methods: ${ALLOWED_METHODS}
-    allowed-headers:
-      - "*"
+    allowed-headers: "*"
     allow-credentials: true
     max-age: 3600

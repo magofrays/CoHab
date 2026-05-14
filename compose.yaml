@@ -57,7 +57,7 @@ services:
       - ./init/init_clickhouse.sh:/docker-entrypoint-initdb.d/init-clickhouse.sh
 
   cohab-back:
-    image: ghcr.io/magofrays/cohab:main
+    image: ghcr.io/cooperativehabitat/cohab:main
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - COHAB_DB=${COHAB_DB}
