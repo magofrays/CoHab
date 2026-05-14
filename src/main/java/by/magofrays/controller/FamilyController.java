@@ -36,9 +36,9 @@ public class FamilyController {
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('USER')")
     public ReadFamilyMemberDto createFamily(@AuthenticationPrincipal MemberPrincipal principal,
-                                            @Validated @NotBlank String createFamilyDto) {
+                                            @RequestBody @Validated @NotBlank String familyName) {
         UUID memberId = principal.getId();
-        return familyService.createFamily(createFamilyDto, memberId);
+        return familyService.createFamily(familyName, memberId);
     }
 
     @PostMapping("/create-invitation")
