@@ -44,7 +44,7 @@ logging:
   level:
     org.springframework.security: ${LOGGING_LEVEL}
     by.magofrays: ${LOGGING_LEVEL}
-    org.apache.kafka: WARN
+    org.apache.kafka: INFO
 
 user:
   max-families: 5

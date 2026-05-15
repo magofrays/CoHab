@@ -34,7 +34,7 @@ public class NotificationService {
 
     public void sendNotification(String key, String message, String from, UUID recipient) {
         log.info("Sending notification to recipient: {}", recipient);
-        notificationKafkaTemplate.send(key, Notification.builder()
+        notificationKafkaTemplate.send("notification", key, Notification.builder()
                 .recipient(recipient)
                 .message(message)
                 .from(from)
